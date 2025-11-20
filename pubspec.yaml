@@ -1,0 +1,68 @@
+name: movie_matrix
+description: "A movie recommendation app with Riverpod & GetX"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 🎯 STATE MANAGEMENT
+  flutter_riverpod: ^2.4.9
+  get: ^4.7.2
+
+  # 🌐 NETWORKING & API
+  retrofit: ^4.2.1
+  dio: ^5.4.0
+  logger: ^2.0.2
+
+  # 📊 JSON SERIALIZATION
+  json_annotation: ^4.8.1
+  freezed_annotation: ^2.4.1
+
+  # 💾 LOCAL STORAGE
+  shared_preferences: ^2.2.2
+
+  # 🖼️ IMAGE HANDLING
+  cached_network_image: ^3.3.0
+  flutter_dotenv: ^5.1.0
+
+  # 🎨 UI & ANIMATIONS
+  flutter_svg: ^2.0.9
+  lottie: ^2.7.0
+  shimmer: ^3.0.0
+  pull_to_refresh: ^2.0.0
+
+  # 🔧 UTILITIES
+  equatable: ^2.0.5
+  uuid: ^4.2.1
+  intl: ^0.18.1
+  url_launcher: ^6.2.2
+
+  # 🎨 ICONS
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # flutter_lints: ^3.0.0
+
+  # 🛠️ CODE GENERATION - COMPATIBLE VERSIONS
+  build_runner: ^2.4.7
+  retrofit_generator: ^9.7.0
+  json_serializable: ^6.7.1
+  
+  # ✅ COMPATIBLE FREEZED VERSIONS
+  freezed: ^2.4.6
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/icons/app_logo.png
