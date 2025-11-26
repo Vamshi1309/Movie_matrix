@@ -14,6 +14,7 @@ class AppTheme {
         secondary: AppColors.secondary,
         surface: AppColors.surface,
         onSurface: AppColors.onSurface,
+        
       ),
       textTheme: TextTheme(
         displayLarge: AppTextStyles.headlineLarge,

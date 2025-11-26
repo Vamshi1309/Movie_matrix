@@ -1,9 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_matrix/core/themes/app_colors.dart';
 import 'package:movie_matrix/core/themes/app_spacing.dart';
-import 'package:movie_matrix/core/themes/app_text_styles.dart';
-import 'package:movie_matrix/core/themes/app_theme.dart';
 import 'package:movie_matrix/providers/theme_provider.dart';
 
 class SplashScreen extends ConsumerWidget {
@@ -52,6 +50,25 @@ class SplashScreen extends ConsumerWidget {
                 'Dive into a personalized universe of\n movies curated just for you.',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: AppSpacing.lg),
+              SizedBox(
+                width: 150,
+                child: LinearProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.ratingLow,
+                  ),
+                  backgroundColor: Colors.grey[300],
+                ),
+              ),
+              SizedBox(height: AppSpacing.md),
+              Text(
+                'Loading your watch List..',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.normal
                 ),
                 textAlign: TextAlign.center,
               ),

@@ -63,6 +63,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/images/Vamshi_Passport.jpg
     - assets/animations/
     - assets/icons/app_logo.png
