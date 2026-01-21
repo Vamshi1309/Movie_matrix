@@ -44,19 +44,20 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: Colors.grey[100],
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppBorderRadius.small),
+          borderRadius: BorderRadius.circular(AppBorderRadius.medium),
           borderSide: BorderSide(color: Color.fromRGBO(148, 163, 184, 0.3)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppBorderRadius.small),
+          borderRadius: BorderRadius.circular(AppBorderRadius.medium),
           borderSide: BorderSide(color: Color.fromRGBO(148, 163, 184, 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppBorderRadius.small),
-          borderSide: BorderSide(color: AppColors.primary),
+          borderRadius: BorderRadius.circular(AppBorderRadius.medium),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
         ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }

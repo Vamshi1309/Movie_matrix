@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 import 'package:movie_matrix/widgets/common/movie_card.dart';
 import 'package:movie_matrix/widgets/common/movie_card_grid.dart';

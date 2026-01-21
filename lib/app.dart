@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:movie_matrix/views/home/home_screen.dart';
-import 'package:movie_matrix/views/main_screen.dart';
 import 'package:movie_matrix/views/splash/splash_screen.dart';
 
 import 'controllers/theme_controller.dart';
@@ -15,7 +13,7 @@ class MyApp extends ConsumerWidget{
     return GetMaterialApp(
       title: 'Movie Matrix',
       theme: theme,
-      home: MainScreen(),
+      home: SplashScreen(),
     );
   }
   

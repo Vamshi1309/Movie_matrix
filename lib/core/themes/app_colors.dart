@@ -3,7 +3,7 @@ import 'dart:ui';
 
 class AppColors {
   // Primary Colors
-  static const Color primary = Color(0xFF2563EB); // Blue from buttons
+  static const Color primary = Color(0xFFE30A2A); // Blue from buttons
   static const Color secondary = Color(0xFF7C3AED); // Purple accent
   static const Color accent = Color(0xFF06B6D4); // Cyan for highlights
   

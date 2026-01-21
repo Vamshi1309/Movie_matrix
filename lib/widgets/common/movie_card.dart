@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:movie_matrix/views/home/all_movies_screen.dart';
 import 'package:movie_matrix/widgets/common/build_movie_card.dart';
 import '../../../core/themes/app_colors.dart';

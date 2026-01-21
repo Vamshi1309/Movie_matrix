@@ -14,6 +14,9 @@ dependencies:
   flutter_riverpod: ^2.4.9
   get: ^4.7.2
 
+  #🛡️ SECURE STORAGE
+  flutter_secure_storage: ^9.0.0 
+
   # 🌐 NETWORKING & API
   retrofit: ^4.2.1
   dio: ^5.4.0
@@ -58,6 +61,21 @@ dev_dependencies:
   
   # ✅ COMPATIBLE FREEZED VERSIONS
   freezed: ^2.4.6
+
+  # 🎨 APP ICON GENERATOR
+  flutter_launcher_icons: ^0.13.1
+
+# ============================================
+# 🎨 APP ICON CONFIGURATION
+# ============================================
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_logo.png"
+
+  # Adaptive icon for Android
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/app_logo.png"
 
 flutter:
   uses-material-design: true

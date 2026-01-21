@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:movie_matrix/controllers/main_controller.dart';
 import 'package:movie_matrix/views/home/home_screen.dart';
 import 'package:movie_matrix/views/profile/profile_screen.dart';

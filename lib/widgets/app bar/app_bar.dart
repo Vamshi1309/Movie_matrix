@@ -4,8 +4,9 @@ import '../../core/themes/app_spacing.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final ThemeData theme;
+  final bool showSubTitle;
 
-  const CustomAppBar({super.key, required this.theme});
+  const CustomAppBar({super.key, required this.theme, this.showSubTitle = false});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
                   ),
                   child: Icon(
                     Icons.movie,
-                    size: 30,
+                    size: 40,
                     color: theme.colorScheme.surface,
                   ),
                 );
@@ -51,10 +52,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
                   'Movie Matrix',
                   style: theme.textTheme.titleLarge,
                 ),
-                Text(
-                  "Tonight's picks for you..",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                Opacity(
+                  opacity: showSubTitle ? 1.0 : 0.0,
+                  child: Text(
+                    "Tonight's picks for you..",
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ),
               ],
