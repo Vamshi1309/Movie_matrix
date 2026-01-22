@@ -10,10 +10,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _checkAuth();
   }
 
-  Future<void> checkAuthStatus() async {
-    await _checkAuth();
-  }
-
   Future<void> _checkAuth() async {
     final token = await _authService.getToken();
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/themes/app_spacing.dart';
 
+// ignore: must_be_immutable
 class BuildMovieCard extends StatelessWidget {
   ThemeData? theme;
   String? imgUrl;
@@ -13,6 +14,7 @@ class BuildMovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('IMAGE URL FROM CARD => "$imgUrl"');
     return SizedBox(
       width: 110, // Fixed width for consistent sizing
       child: Card(

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/views/home/all_movies_screen.dart';
 import 'package:movie_matrix/widgets/common/build_movie_card.dart';
 import '../../../core/themes/app_colors.dart';
@@ -9,17 +10,19 @@ import '../../../core/themes/app_spacing.dart';
 class MovieCard extends StatelessWidget {
   final ThemeData theme;
   final String sectionHeader;
-  final int itemCount;
+  final List<MovieModel> movies;
 
   const MovieCard({
     super.key,
     required this.theme,
-    required this.itemCount,
     required this.sectionHeader,
+    required this.movies,
   });
 
   @override
   Widget build(BuildContext context) {
+    final displayMovies = movies.length > 10 ? movies.sublist(0, 10) : movies;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -57,45 +60,40 @@ class MovieCard extends StatelessWidget {
             height: 220,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: itemCount,
+              itemCount: displayMovies.length + 1,
               itemBuilder: (context, index) {
-                if (index < 10) {
-                  final movieData = {
-                    'imgUrl': "https://picsum.photos/200/300",
-                    'title': 'Movie ${index + 1}',
-                    'rating': (5.0 + index % 5).toDouble(),
-                  };
-
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: BuildMovieCard(
-                      theme: theme,
-                      imgUrl: movieData['imgUrl'] as String,
-                      title: movieData['title'] as String,
-                      rating: movieData['rating'] as double,
+                if (index == displayMovies.length) {
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(() => AllMoviesScreen(
+                            sectionHeader: sectionHeader,
+                          ));
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      margin: const EdgeInsets.only(left: 8.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.navigate_next,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
                   );
                 }
 
-                // --- Final Arrow Button ---
-                return GestureDetector(
-                  onTap: () {
-                    Get.to(AllMoviesScreen(
-                      sectionHeader: sectionHeader,
-                    ));
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.navigate_next,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                final movie = displayMovies[index];
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: BuildMovieCard(
+                    theme: theme,
+                    imgUrl: 'http://192.168.0.81:8080${movie.posterUrl}',
+                    title: movie.title,
+                    rating: movie.rating,
                   ),
                 );
               },
