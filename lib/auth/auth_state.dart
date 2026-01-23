@@ -32,7 +32,7 @@ class AuthState {
     );
   }
 
-  factory AuthState.authenticated(String token) {
+  factory AuthState.authenticated(String? token) {
     return AuthState(
       isAuthenticated: true,
       isLoading: false,

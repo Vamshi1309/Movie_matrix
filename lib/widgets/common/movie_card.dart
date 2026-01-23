@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
@@ -10,11 +9,13 @@ import '../../../core/themes/app_spacing.dart';
 class MovieCard extends StatelessWidget {
   final ThemeData theme;
   final String sectionHeader;
+  final int categoryId;
   final List<MovieModel> movies;
 
   const MovieCard({
     super.key,
     required this.theme,
+    required this.categoryId,
     required this.sectionHeader,
     required this.movies,
   });
@@ -42,6 +43,7 @@ class MovieCard extends StatelessWidget {
                 onTap: () {
                   Get.to(AllMoviesScreen(
                     sectionHeader: sectionHeader,
+                    categoryId: categoryId,
                   ));
                 },
                 child: Text(
@@ -67,6 +69,7 @@ class MovieCard extends StatelessWidget {
                     onTap: () {
                       Get.to(() => AllMoviesScreen(
                             sectionHeader: sectionHeader,
+                            categoryId: categoryId,
                           ));
                     },
                     child: Container(

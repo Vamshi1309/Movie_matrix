@@ -32,6 +32,7 @@ class HomeScreen extends StatelessWidget {
                     return MovieCard(
                       theme: theme,
                       sectionHeader: "Trending",
+                      categoryId: 1,
                       movies: controller.trendingMovies.toList(),
                     );
                   }
@@ -46,6 +47,7 @@ class HomeScreen extends StatelessWidget {
                     return MovieCard(
                       theme: theme,
                       sectionHeader: "Top Rated",
+                      categoryId: 2,
                       movies: controller.topRatedMovies.toList(),
                     );
                   }
@@ -61,6 +63,7 @@ class HomeScreen extends StatelessWidget {
                     return MovieCard(
                       theme: theme,
                       sectionHeader: "For You",
+                      categoryId: 3,
                       movies: controller.forYouMovies.toList(),
                     );
                   }

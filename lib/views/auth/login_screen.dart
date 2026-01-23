@@ -66,13 +66,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
 
     try {
-      await ref.read(authProvider.notifier).login(email, password);
+      final data = await ref.read(authProvider.notifier).login(email, password);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(data.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 600));
       Get.offAll(() => MainScreen());
     } catch (e) {
       if (mounted) {
+        String errorMessage = e.toString();
+
+        // Remove "Exception: " prefix if present
+        if (errorMessage.startsWith('Exception: ')) {
+          errorMessage = errorMessage.substring(11);
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login Failed: ${e.toString()}'),
+            content: Text('Login Failed: ${errorMessage}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -95,13 +112,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
 
     try {
-      await ref.read(authProvider.notifier).register(email, password);
+      final data =
+          await ref.read(authProvider.notifier).register(email, password);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(data.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 600));
       Get.offAll(() => MainScreen());
     } catch (e) {
       if (mounted) {
+        String errorMessage = e.toString();
+        if (errorMessage.startsWith('Exception: ')) {
+          errorMessage = errorMessage.substring(11);
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Registration Failed: ${e.toString()}'),
+            content: Text('Registration Failed: ${errorMessage}'),
             backgroundColor: Colors.red,
           ),
         );

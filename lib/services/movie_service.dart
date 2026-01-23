@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 
 class MovieService {
@@ -20,9 +21,12 @@ class MovieService {
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (options, handler) async {
       final token = await storage.read(key: 'auth_token');
-     
+
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';
+        AppLogger.i('🔑 Token attached to request');
+      } else {
+        AppLogger.w('⚠️ No token available');
       }
       return handler.next(options);
     }));
@@ -30,13 +34,12 @@ class MovieService {
 
   Future<List<MovieModel>> getTrendingMovies() async {
     try {
+      AppLogger.i('📡 Fetching trending movies...');
       final response = await dio.get('/trending');
+      AppLogger.i('✅ Trending movies fetched successfully');
 
-      // Check if response.data is actually a Map, not a List
-      if (response.data is Map<String, dynamic>) {
-      }
+      final data = response.data["data"];
 
-      final data = response.data;
       if (data is List) {
         return data.map((e) {
           if (e is Map<String, dynamic>) {
@@ -49,15 +52,33 @@ class MovieService {
         throw Exception('Unexpected response format: ${data.runtimeType}');
       }
     } on DioException catch (e) {
-      rethrow;
+      AppLogger.e('❌ Trending movies error: ${e.type}');
+      AppLogger.e('Response data type: ${e.response?.data.runtimeType}');
+      AppLogger.e('Response data: ${e.response?.data}');
+      // FIX: Handle both Map and String error responses
+      String errorMessage = 'Failed to fetch trending movies';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map) {
+          errorMessage = e.response!.data['message'] ?? errorMessage;
+          AppLogger.e('Error from Map: $errorMessage');
+        } else if (e.response!.data is String) {
+          errorMessage = e.response!.data;
+          AppLogger.e('Error from String: $errorMessage');
+        }
+      }
+
+      throw Exception(errorMessage);
     }
   }
 
   Future<List<MovieModel>> getTopRatedMovies() async {
     try {
+      AppLogger.i('📡 Fetching top rated movies...');
       final response = await dio.get('/top-rated');
+      AppLogger.i('✅ Top rated movies fetched successfully');
 
-      final data = response.data;
+      final data = response.data["data"];
       if (data is List) {
         return data.map((e) {
           if (e is Map<String, dynamic>) {
@@ -70,16 +91,33 @@ class MovieService {
         throw Exception('Unexpected response format');
       }
     } on DioException catch (e) {
-      throw Exception(
-          e.response?.data['message'] ?? 'Failed to fetch top rated movies');
+      AppLogger.e('❌ Top rated movies error: ${e.type}');
+      AppLogger.e('Response data type: ${e.response?.data.runtimeType}');
+      AppLogger.e('Response data: ${e.response?.data}');
+      // FIX: Handle both Map and String error responses
+      String errorMessage = 'Failed to fetch top rated movies';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map) {
+          errorMessage = e.response!.data['message'] ?? errorMessage;
+          AppLogger.e('Error from Map: $errorMessage');
+        } else if (e.response!.data is String) {
+          errorMessage = e.response!.data;
+          AppLogger.e('Error from String: $errorMessage');
+        }
+      }
+
+      throw Exception(errorMessage);
     }
   }
 
   Future<List<MovieModel>> getForYouMovies() async {
     try {
+      AppLogger.i('📡 Fetching for you movies...');
       final response = await dio.get('/for-you');
+      AppLogger.i('✅ For you movies fetched successfully');
 
-      final data = response.data;
+      final data = response.data["data"];
       if (data is List) {
         return data.map((e) {
           if (e is Map<String, dynamic>) {
@@ -92,8 +130,23 @@ class MovieService {
         throw Exception('Unexpected response format');
       }
     } on DioException catch (e) {
-      throw Exception(
-          e.response?.data['message'] ?? 'Failed to fetch for you movies');
+      AppLogger.e('❌ For you movies error: ${e.type}');
+      AppLogger.e('Response data type: ${e.response?.data.runtimeType}');
+      AppLogger.e('Response data: ${e.response?.data}');
+
+      String errorMessage = 'Failed to fetch for you movies';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map) {
+          errorMessage = e.response!.data['message'] ?? errorMessage;
+          AppLogger.e('Error from Map: $errorMessage');
+        } else if (e.response!.data is String) {
+          errorMessage = e.response!.data;
+          AppLogger.e('Error from String: $errorMessage');
+        }
+      }
+
+      throw Exception(errorMessage);
     }
   }
 }

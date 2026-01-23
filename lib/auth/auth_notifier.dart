@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movie_matrix/auth/auth_state.dart';
+import 'package:movie_matrix/data/models/auth_model.dart';
 import 'package:movie_matrix/services/auth_service.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
@@ -27,15 +28,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<AuthModel> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final token = await _authService.login(email, password);
+      final authData = await _authService.login(email, password);
       state = AuthState(
         isAuthenticated: true,
         isLoading: false,
-        token: token,
+        token: authData.token,
       );
+
+      return authData;
     } catch (e) {
       state = AuthState(
         isAuthenticated: false,
@@ -46,15 +49,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> register(String email, String password) async {
+  Future<AuthModel> register(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final token = await _authService.register(email, password);
+      final authData = await _authService.register(email, password);
       state = AuthState(
         isAuthenticated: true,
         isLoading: false,
-        token: token,
+        token: authData.token,
       );
+
+      return authData;
     } catch (e) {
       state = AuthState(
         isAuthenticated: false,

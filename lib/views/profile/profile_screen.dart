@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:movie_matrix/controllers/theme_controller.dart';
 import 'package:movie_matrix/providers/auth_provider.dart';
+import 'package:movie_matrix/views/auth/login_screen.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -158,6 +160,16 @@ class ProfileScreen extends ConsumerWidget {
                 child: ElevatedButton(
                     onPressed: () {
                       ref.read(authProvider.notifier).logout();
+                      Get.offAll(() => LoginScreen());
+
+                      Get.snackbar(
+                        'Logged Out',
+                        'You have been logged out successfully',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        duration: Duration(seconds: 2),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
