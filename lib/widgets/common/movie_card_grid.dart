@@ -59,7 +59,7 @@ class MovieCardGrid extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 12.0),
                         child: BuildMovieCard(
                           theme: theme,
-                          imgUrl: 'http://192.168.0.81:8080${movieData.posterUrl}',
+                          imgUrl: 'http://10.0.2.2:8080${movieData.posterUrl}',
                           title: movieData.title,
                           rating: movieData.rating,
                         ),

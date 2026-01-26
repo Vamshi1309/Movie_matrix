@@ -2,32 +2,22 @@ import 'package:get/get.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/services/movie_service.dart';
 
-class HomeController extends GetxController {
+class HomeMovieController extends GetxController {
   final MovieService _movieService = MovieService();
 
   var trendingMovies = <MovieModel>[].obs;
-  var topRatedMovies = <MovieModel>[].obs;
   var forYouMovies = <MovieModel>[].obs;
 
-  // Loading state
   var isLoadingTrending = false.obs;
-  var isLoadingTopRated = false.obs;
   var isLoadingForYou = false.obs;
 
-  // Error state
   var errorTrending = ''.obs;
-  var errorTopRated = ''.obs;
   var errorForYou = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchAllMovies();
-  }
-
-  void fetchAllMovies() async {
     fetchTrendingMovies();
-    fetchTopRatedMovies();
     fetchForYouMovies();
   }
 
@@ -35,8 +25,7 @@ class HomeController extends GetxController {
     try {
       isLoadingTrending.value = true;
       errorTrending.value = '';
-      final movies = await _movieService.getTrendingMovies();
-      trendingMovies.value = movies;
+      trendingMovies.value = await _movieService.getTrendingMovies();
     } catch (e) {
       errorTrending.value = e.toString();
     } finally {
@@ -44,25 +33,11 @@ class HomeController extends GetxController {
     }
   }
 
-  void fetchTopRatedMovies() async {
-    try {
-      isLoadingTopRated.value = true;
-      errorTopRated.value = '';
-      final movies = await _movieService.getTopRatedMovies();
-      topRatedMovies.value = movies;
-    } catch (e) {
-      errorTopRated.value = e.toString();
-    } finally {
-      isLoadingTopRated.value = false;
-    }
-  }
-
   void fetchForYouMovies() async {
     try {
       isLoadingForYou.value = true;
       errorForYou.value = '';
-      final movies = await _movieService.getForYouMovies();
-      forYouMovies.value = movies;
+      forYouMovies.value = await _movieService.getForYouMovies();
     } catch (e) {
       errorForYou.value = e.toString();
     } finally {

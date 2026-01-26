@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:movie_matrix/controllers/home_controller.dart';
+import 'package:movie_matrix/controllers/home%20controller/home_controller.dart';
+import 'package:movie_matrix/controllers/top%20rated%20movies%20controller/top_rated_controller.dart';
 import 'package:movie_matrix/core/themes/app_spacing.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
@@ -10,7 +11,8 @@ import '../../widgets/common/movie_card.dart';
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
-  final HomeController controller = Get.put(HomeController());
+  final HomeMovieController controller = Get.put(HomeMovieController());
+  final TopRatedController topRatedController = Get.put(TopRatedController());
 
   @override
   Widget build(BuildContext context) {
@@ -39,16 +41,16 @@ class HomeScreen extends StatelessWidget {
                 }),
                 SizedBox(height: AppSpacing.lg),
                 Obx(() {
-                  if (controller.isLoadingTopRated.value) {
+                  if (topRatedController.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (controller.errorTopRated.value.isNotEmpty) {
-                    return Text(controller.errorTopRated.value);
+                  } else if (topRatedController.error.value.isNotEmpty) {
+                    return Text(topRatedController.error.value);
                   } else {
                     return MovieCard(
                       theme: theme,
                       sectionHeader: "Top Rated",
                       categoryId: 2,
-                      movies: controller.topRatedMovies.toList(),
+                      movies: topRatedController.topRatedMovies.toList(),
                     );
                   }
                 }),

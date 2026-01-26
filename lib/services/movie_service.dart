@@ -10,7 +10,7 @@ class MovieService {
   MovieService()
       : dio = Dio(
           BaseOptions(
-              baseUrl: 'http://192.168.0.81:8080/api/movies',
+              baseUrl: 'http://10.0.2.2:8080/api/movies',
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 10),
               headers: {
@@ -57,6 +57,85 @@ class MovieService {
       AppLogger.e('Response data: ${e.response?.data}');
       // FIX: Handle both Map and String error responses
       String errorMessage = 'Failed to fetch trending movies';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map) {
+          errorMessage = e.response!.data['message'] ?? errorMessage;
+          AppLogger.e('Error from Map: $errorMessage');
+        } else if (e.response!.data is String) {
+          errorMessage = e.response!.data;
+          AppLogger.e('Error from String: $errorMessage');
+        }
+      }
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<List<MovieModel>> getNowPlayingMovies() async {
+    try {
+      AppLogger.i('📡 Fetching now playing movies...');
+      final response = await dio.get('/now-playing');
+      AppLogger.i('✅ Now playing movies fetched successfully');
+
+      final data = response.data["data"];
+
+      if (data is List) {
+        return data.map((e) {
+          if (e is Map<String, dynamic>) {
+            return MovieModel.fromJson(e);
+          } else {
+            throw Exception('Invalid movie data format');
+          }
+        }).toList();
+      } else {
+        throw Exception('Unexpected response format: ${data.runtimeType}');
+      }
+    } on DioException catch (e) {
+      AppLogger.e('❌ Now playing movies error: ${e.type}');
+      AppLogger.e('Response data type: ${e.response?.data.runtimeType}');
+      AppLogger.e('Response data: ${e.response?.data}');
+
+      String errorMessage = 'Failed to fetch now playing movies';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map) {
+          errorMessage = e.response!.data['message'] ?? errorMessage;
+          AppLogger.e('Error from Map: $errorMessage');
+        } else if (e.response!.data is String) {
+          errorMessage = e.response!.data;
+          AppLogger.e('Error from String: $errorMessage');
+        }
+      }
+
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<List<MovieModel>> getPopularMovies() async {
+    try {
+      AppLogger.i('📡 Fetching popular movies...');
+      final response = await dio.get('/popular');
+      AppLogger.i('✅ Popular movies fetched successfully');
+
+      final data = response.data["data"];
+      if (data is List) {
+        return data.map((e) {
+          if (e is Map<String, dynamic>) {
+            return MovieModel.fromJson(e);
+          } else {
+            throw Exception('Invalid movie data format');
+          }
+        }).toList();
+      } else {
+        throw Exception('Unexpected response format');
+      }
+    } on DioException catch (e) {
+      AppLogger.e('❌ Popular movies error: ${e.type}');
+      AppLogger.e('Response data type: ${e.response?.data.runtimeType}');
+      AppLogger.e('Response data: ${e.response?.data}');
+
+      String errorMessage = 'Failed to fetch popular movies';
 
       if (e.response?.data != null) {
         if (e.response!.data is Map) {

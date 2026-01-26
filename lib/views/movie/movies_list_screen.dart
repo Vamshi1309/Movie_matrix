@@ -1,33 +1,40 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_matrix/data/models/movie_model.dart';
 
 class MovieListScreen extends StatelessWidget {
   final ThemeData theme;
-  final String imageUrl;
-  final String movieName;
-  final double rating;
-  final int year;
-  final String genre;
-  final String duration;
-  final String description;
+  final List<MovieModel> movies;
+  final bool isLoading;
+  final String error;
 
   MovieListScreen(
       {super.key,
       required this.theme,
-      required this.imageUrl,
-      required this.movieName,
-      required this.rating,
-      required this.year,
-      required this.genre,
-      required this.duration,
-      required this.description});
+      required this.movies,
+      required this.isLoading,
+      required this.error});
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (error.isNotEmpty) {
+      return Center(child: Text(error, style: theme.textTheme.bodyMedium));
+    }
+
+    if (movies.isEmpty) {
+      return Center(
+          child:
+              Text("No movies available", style: theme.textTheme.bodyMedium));
+    }
+
     return Container(
         width: double.infinity,
         child: ListView.builder(
-            itemCount: 10,
+            itemCount: movies.length,
             itemBuilder: (context, index) {
               return Column(
                 children: [
@@ -44,7 +51,7 @@ class MovieListScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: CachedNetworkImage(
-                              imageUrl: imageUrl,
+                              imageUrl: 'http://10.0.2.2:8080${movies[index].posterUrl}',
                               height: 110,
                               // Adjusted height
                               width: 80,
@@ -86,7 +93,7 @@ class MovieListScreen extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        movieName,
+                                        movies[index].title,
                                         style: theme.textTheme.titleLarge
                                             ?.copyWith(
                                                 fontWeight: FontWeight.bold,
@@ -104,7 +111,7 @@ class MovieListScreen extends StatelessWidget {
                                     ),
                                     SizedBox(width: 4),
                                     Text(
-                                      rating.toString(),
+                                      movies[index].rating.toString(),
                                       style: theme.textTheme.titleMedium
                                           ?.copyWith(
                                               fontWeight: FontWeight.bold,
@@ -118,7 +125,7 @@ class MovieListScreen extends StatelessWidget {
 
                                 // Year, Genre, Duration
                                 Text(
-                                  "${year} · ${genre} · ${duration}",
+                                  "${movies[index].releaseYear} · ${movies[index].genre} · ${movies[index].duration} mins",
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: Colors.grey[600],
                                   ),
@@ -128,7 +135,7 @@ class MovieListScreen extends StatelessWidget {
 
                                 // Description
                                 Text(
-                                  description,
+                                  movies[index].description,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: Colors.grey[700],
                                     overflow: TextOverflow.ellipsis,

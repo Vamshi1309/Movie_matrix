@@ -6,6 +6,7 @@ class MovieModel {
   final double rating;
   final String posterUrl;
   final int duration;
+  final String genre; 
 
   MovieModel({
     required this.id,
@@ -15,6 +16,7 @@ class MovieModel {
     required this.rating,
     required this.posterUrl,
     required this.duration,
+    required this.genre,
   });
 
   factory MovieModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class MovieModel {
       rating: double.tryParse(json['rating'].toString()) ?? 0.0,
       posterUrl: json['posterUrl'] ?? '',
       duration: int.tryParse(json['duration'].toString()) ?? 0,
+      genre: json['genre'] ?? '', 
     );
   }
 }

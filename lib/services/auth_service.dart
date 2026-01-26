@@ -5,7 +5,7 @@ import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/auth_model.dart';
 
 class AuthService {
-  final baseUrl = 'http://192.168.0.81:8080/api/auth';
+  final baseUrl = 'http://10.0.2.2:8080/api/auth';
   final storage = const FlutterSecureStorage();
   final appLogger = AppLogger();
 

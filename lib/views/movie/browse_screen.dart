@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:movie_matrix/controllers/browse%20controller/browse_controller.dart';
+import 'package:movie_matrix/controllers/top%20rated%20movies%20controller/top_rated_controller.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
 import '../../controllers/theme_controller.dart';
 import 'movies_list_screen.dart';
 
 class BrowseScreen extends StatelessWidget {
+  final BrowseMovieController controller = Get.put(BrowseMovieController());
+  final TopRatedController topRatedController = Get.put(TopRatedController());
+
   @override
   Widget build(BuildContext context) {
     final theme = Get.put(ThemeController()).themeData;
@@ -34,49 +40,40 @@ class BrowseScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                  child: TabBarView(children: [
-                // Popular Tab
-                MovieListScreen(
-                  theme: theme,
-                  imageUrl:
-                      "https://m.media-amazon.com/images/M/MV5BNDJiZDgzZjctYmFiYy00MjZhLTllNmUtODViNDQ2ODMwMDM4XkEyXkFqcGdeQXVyMTUzOTcyODA5._V1_FMjpg_UX1000_.jpg",
-                  movieName: "Varanasi: City of Light",
-                  rating: 8.7,
-                  year: 2024,
-                  genre: "Mystery/Thriller",
-                  duration: "2h 18m",
-                  description:
-                      "A detective uncovers ancient secrets in the spiritual capital of India while investigating a series of mysterious disappearances.",
-                ),
+                child: TabBarView(
+                  children: [
+                    // Popular Tab
+                    Obx(() {
+                      return MovieListScreen(
+                        theme: theme,
+                        movies: controller.popularMovies,
+                        isLoading: controller.isLoadingPopular.value,
+                        error: controller.errorPopular.value,
+                      );
+                    }),
 
-                // Now Playing Tab
-                MovieListScreen(
-                  theme: theme,
-                  imageUrl:
-                      "https://m.media-amazon.com/images/M/MV5BZGQ2ODNiNzktOWE3Ny00M2RlLWE4YTgtNzliMzEyNzU1YzU0XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg",
-                  movieName: "AA22: Code Red",
-                  rating: 7.9,
-                  year: 2023,
-                  genre: "Action/Sci-Fi",
-                  duration: "2h 05m",
-                  description:
-                      "An elite agent must stop a rogue AI system from triggering global chaos in this high-tech espionage thriller.",
-                ),
+                    // Now Playing Tab
+                    Obx(() {
+                      return MovieListScreen(
+                        theme: theme,
+                        movies: controller.nowPlayingMovies,
+                        isLoading: controller.isLoadingNowPlaying.value,
+                        error: controller.errorNowPlaying.value,
+                      );
+                    }),
 
-                // Top Rated Tab
-                MovieListScreen(
-                  theme: theme,
-                  imageUrl:
-                      "https://m.media-amazon.com/images/M/MV5BMTY5ODk1NzUyMl5BMl5BanBnXkFtZTgwMjUyNzEyMTE@._V1_FMjpg_UX1000_.jpg",
-                  movieName: "Dragon's Legacy",
-                  rating: 9.2,
-                  year: 2024,
-                  genre: "Fantasy/Adventure",
-                  duration: "2h 45m",
-                  description:
-                      "In a mythical kingdom, a young warrior must embrace her dragon-riding heritage to save her people from dark forces.",
+                    // Top Rated Tab
+                    Obx(() {
+                      return MovieListScreen(
+                        theme: theme,
+                        movies: topRatedController.topRatedMovies,
+                        isLoading: topRatedController.isLoading.value,
+                        error: topRatedController.error.value,
+                      );
+                    }),
+                  ],
                 ),
-              ]))
+              )
             ],
           ),
         ),

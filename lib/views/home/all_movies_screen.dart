@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:movie_matrix/controllers/home_controller.dart';
+import 'package:movie_matrix/controllers/browse%20controller/browse_controller.dart';
+import 'package:movie_matrix/controllers/home%20controller/home_controller.dart';
+import 'package:movie_matrix/controllers/top%20rated%20movies%20controller/top_rated_controller.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 import 'package:movie_matrix/widgets/common/movie_card_grid.dart';
@@ -13,7 +15,8 @@ class AllMoviesScreen extends StatelessWidget {
 
   AllMoviesScreen({Key? key, this.sectionHeader, required this.categoryId}) : super(key: key);
 
-  final HomeController controller = Get.put(HomeController());
+  final HomeMovieController controller = Get.put(HomeMovieController());
+  final TopRatedController topRatedController = Get.put(TopRatedController());
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,7 @@ class AllMoviesScreen extends StatelessWidget {
       case 1:
         return controller.trendingMovies.toList();
       case 2:
-        return controller.topRatedMovies.toList();
+        return topRatedController.topRatedMovies.toList();
       case 3:
         return controller.forYouMovies.toList();
       default:
