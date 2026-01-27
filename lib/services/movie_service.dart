@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 
@@ -10,7 +11,7 @@ class MovieService {
   MovieService()
       : dio = Dio(
           BaseOptions(
-              baseUrl: 'http://10.0.2.2:8080/api/movies',
+              baseUrl: '${ApiConfig.baseUrl}/api/movies',
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 10),
               headers: {

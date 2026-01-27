@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 
 class MovieListScreen extends StatelessWidget {
@@ -51,7 +52,8 @@ class MovieListScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: CachedNetworkImage(
-                              imageUrl: 'http://10.0.2.2:8080${movies[index].posterUrl}',
+                              imageUrl:
+                                  ApiConfig.getFullImageUrl(movies[index].posterUrl),
                               height: 110,
                               // Adjusted height
                               width: 80,

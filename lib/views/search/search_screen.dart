@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_rx/src/rx_workers/rx_workers.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:movie_matrix/controllers/search_controller/search_controller.dart';
 import 'package:movie_matrix/controllers/theme_controller.dart';
 import 'package:movie_matrix/core/themes/app_spacing.dart';
+import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -14,84 +17,24 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final List<String> recentSearches = [
-    "Pushpa 2: The Rule",
-    "Devara: Part 1",
-    "Game Changer",
-    "Kalki 2898 AD",
-    "Salaar: Part 2 - Shouryanga Parvam"
-  ];
+  final searchController = Get.put(MovieSearchController());
+  final TextEditingController _searchTextController = TextEditingController();
 
-  final List<String> popularMovies = [
-    "RRR",
-    "Baahubali 2: The Conclusion",
-    "Ala Vaikunthapurramuloo",
-    "Sarileru Neekevvaru",
-    "Sye Raa Narasimha Reddy"
-  ];
-
-  final List<String> allMovies = [
-    "Pushpa 2: The Rule",
-    "Devara: Part 1",
-    "Game Changer",
-    "Kalki 2898 AD",
-    "Salaar: Part 2 - Shouryanga Parvam",
-    "RRR",
-    "Baahubali 2: The Conclusion",
-    "Ala Vaikunthapurramuloo",
-    "Sarileru Neekevvaru",
-    "Sye Raa Narasimha Reddy",
-    "Baahubali: The Beginning",
-    "Magadheera",
-    "Arjun Reddy",
-    "KGF: Chapter 2",
-    "Jersey",
-    "HanuMan",
-    "Guntur Kaaram",
-    "Naa Saami Ranga",
-    "Tillu Square",
-    "Eagle"
-  ];
-
-  String _searchQuery = '';
-  List<String> _searchResults = [];
-  Timer? _debounceTimer;
-  bool _isSearching = false;
-  final TextEditingController _searchController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    // ✅ Sync text field with searchQuery observable
+    ever(searchController.searchQuery, (query) {
+      if (_searchTextController.text != query) {
+        _searchTextController.text = query;
+      }
+    });
+  }
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
-    _searchController.dispose();
+    _searchTextController.dispose();
     super.dispose();
-  }
-
-  void _performSearch(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-        _isSearching = false;
-      });
-      return;
-    }
-
-    setState(() {
-      _isSearching = true;
-      _searchResults = allMovies
-          .where((movie) => movie.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
-
-  void _onSearchChanged(String query) {
-    setState(() {
-      _searchQuery = query;
-    });
-
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(Duration(milliseconds: 500), () {
-      _performSearch(query);
-    });
   }
 
   @override
@@ -113,31 +56,39 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
             SizedBox(height: AppSpacing.lg),
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Search movies..",
-                prefixIcon: Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearchChanged('');
-                        },
-                        icon: Icon(
-                          Icons.clear,
-                          color: Colors.red,
-                        ))
-                    : null,
-              ),
-              onChanged: _onSearchChanged,
-            ),
+            Obx(() => TextField(
+                  controller: _searchTextController,
+                  decoration: InputDecoration(
+                    hintText: "Search movies..",
+                    prefixIcon: Icon(Icons.search),
+                    suffixIcon: searchController.searchQuery.value.isNotEmpty
+                        ? IconButton(
+                            onPressed: () {
+                              _searchTextController.clear();
+                              searchController.clearSearch();
+                            },
+                            icon: Icon(
+                              Icons.clear,
+                              color: Colors.red,
+                            ))
+                        : null,
+                  ),
+                  onChanged: searchController.onSearchChanged,
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      searchController.onMovieSelected(value.trim());
+                    }
+                  },
+                )),
             SizedBox(height: AppSpacing.md),
-            if (_isSearching && _searchQuery.isNotEmpty) ...[
-              _buildSearchSection(theme: theme)
-            ] else ...[
-              _buildDefaultSection(theme: theme)
-            ]
+            Obx(() {
+              // Show suggestions if user is typing (2+ characters)
+              if (searchController.searchQuery.value.trim().length >= 2) {
+                return _buildSearchSection(theme: theme);
+              } else {
+                return _buildDefaultSection(theme: theme);
+              }
+            })
           ],
         ),
       ),
@@ -145,71 +96,127 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchSection({required ThemeData theme}) {
-    return Expanded(
-        child: ListView.builder(
-            itemCount: _searchResults.length,
-            itemBuilder: (context, index) {
-              final movie = _searchResults[index];
-              return ListTile(
-                leading: Icon(Icons.movie, color: Colors.red),
-                title: Text(
-                  movie,
-                  style: theme.textTheme.bodyMedium,
+    return Expanded(child: Obx(() {
+      if (searchController.isLoadingSuggestions.value) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      if (searchController.suggestions.isEmpty) {
+        return Center(
+          child: Text(
+            'No movies found',
+            style: theme.textTheme.bodyMedium,
+          ),
+        );
+      }
+
+      return ListView.builder(
+          itemCount: searchController.suggestions.length,
+          itemBuilder: (context, index) {
+            final movie = searchController.suggestions[index];
+            return ListTile(
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Image.network(
+                  ApiConfig.getFullImageUrl(movie.posterUrl),
+                  width: 50,
+                  height: 75,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 50,
+                      height: 75,
+                      color: Colors.grey[300],
+                      child: Icon(Icons.movie, color: Colors.red),
+                    );
+                  },
                 ),
-                trailing: Icon(Icons.chevron_right),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                        "Coming soon..",
-                      ),
-                      backgroundColor: Colors.cyan));
-                },
-              );
-            }));
+              ),
+              title: Text(
+                movie.title,
+                style: theme.textTheme.bodyMedium,
+              ),
+              trailing: Icon(Icons.chevron_right),
+              onTap: () => searchController.onMovieSelected(movie.title),
+            );
+          });
+    }));
   }
 
   Widget _buildDefaultSection({required ThemeData theme}) {
     return Expanded(
-      child: ListView(
-        children: [
-          _buildWrapSection(
-              title: "Recent searches",
-              list: recentSearches,
-              theme: theme,
-              onDelete: (movie) {
-                setState(() {
-                  recentSearches.remove(movie);
-                });
-              },
-              onTap: (movie) {
-                _searchController.text = movie;
-                _onSearchChanged(movie);
-              }),
-          SizedBox(height: AppSpacing.md),
-          _buildWrapSection(
-              title: "Popular Now",
-              list: popularMovies,
-              theme: theme,
-              onDelete: (movie) {
-                setState(() {
-                  popularMovies.remove(movie);
-                });
-              },
-              onTap: (movie) {
-                _searchController.text = movie;
-                _onSearchChanged(movie);
-              }),
-        ],
-      ),
+      child: Obx(() {
+        // Show loading
+        if (searchController.isLoadingData.value) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        // Show error
+        if (searchController.error.value.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: ${searchController.error.value}'),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: searchController.loadSearchData,
+                  child: Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Show no data
+        if (searchController.searchData.value == null) {
+          return Center(child: Text('No data available'));
+        }
+
+        final data = searchController.searchData.value!;
+
+        // Show recent searches and popular movies
+        return ListView(
+          children: [
+            // Recent Searches
+            if (data.recentSearches.isNotEmpty) ...[
+              _buildWrapSection(
+                title: "Recent searches",
+                list: data.recentSearches,
+                theme: theme,
+                onDelete: (movie) {
+                  // Optional: implement delete functionality
+                },
+                onTap: searchController.onChipTap,
+              ),
+              SizedBox(height: AppSpacing.md),
+            ],
+
+            // Popular Movies
+            if (data.popularMovies.isNotEmpty) ...[
+              _buildWrapSection(
+                title: "Popular Now",
+                list: data.popularMovies,
+                theme: theme,
+                onDelete: (movie) {
+                  // Optional: implement delete functionality
+                },
+                onTap: searchController.onChipTap,
+              ),
+            ],
+          ],
+        );
+      }),
     );
   }
 
-  Widget _buildWrapSection(
-      {required String title,
-      required List<String> list,
-      required ThemeData theme,
-      required Function(String) onDelete,
-      required Function(String) onTap}) {
+  Widget _buildWrapSection({
+    required String title,
+    required List<String> list,
+    required ThemeData theme,
+    required Function(String) onDelete,
+    required Function(String) onTap,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -229,7 +236,8 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               backgroundColor: Color(0xFFF8FAFF),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
               deleteIcon: Icon(
                 Icons.close,
                 color: Colors.red,

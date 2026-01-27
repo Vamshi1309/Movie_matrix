@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/views/home/all_movies_screen.dart';
 import 'package:movie_matrix/widgets/common/build_movie_card.dart';
@@ -94,7 +95,7 @@ class MovieCard extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 12.0),
                   child: BuildMovieCard(
                     theme: theme,
-                    imgUrl: 'http://10.0.2.2:8080${movie.posterUrl}',
+                    imgUrl: ApiConfig.getFullImageUrl(movie.posterUrl),
                     title: movie.title,
                     rating: movie.rating,
                   ),

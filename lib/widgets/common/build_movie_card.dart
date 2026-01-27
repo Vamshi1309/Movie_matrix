@@ -14,7 +14,6 @@ class BuildMovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('IMAGE URL FROM CARD => "$imgUrl"');
     return SizedBox(
       width: 110, // Fixed width for consistent sizing
       child: Card(

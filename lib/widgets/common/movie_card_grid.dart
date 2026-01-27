@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/widgets/common/build_movie_card.dart';
 import '../../../core/themes/app_spacing.dart';
@@ -59,7 +60,7 @@ class MovieCardGrid extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 12.0),
                         child: BuildMovieCard(
                           theme: theme,
-                          imgUrl: 'http://10.0.2.2:8080${movieData.posterUrl}',
+                          imgUrl: ApiConfig.getFullImageUrl(movieData.posterUrl),
                           title: movieData.title,
                           rating: movieData.rating,
                         ),
