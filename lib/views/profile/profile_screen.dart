@@ -3,12 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:movie_matrix/controllers/theme_controller.dart';
+import 'package:movie_matrix/controllers/user%20controller/user_controller.dart';
+import 'package:movie_matrix/data/models/user_model.dart';
 import 'package:movie_matrix/providers/auth_provider.dart';
 import 'package:movie_matrix/views/auth/login_screen.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
 class ProfileScreen extends ConsumerWidget {
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+  final UserController controller = Get.put(UserController());
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Get.put(ThemeController()).themeData;
@@ -63,70 +72,93 @@ class ProfileScreen extends ConsumerWidget {
               elevation: 5,
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Details",
-                          style: theme.textTheme.titleMedium
-                              ?.copyWith(color: Colors.red),
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              _showEditDialog(context, theme);
-                            },
-                            icon: Icon(
-                              Icons.edit,
-                              size: 18,
-                              color: Colors.red,
-                            ))
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Name",
-                              style: theme.textTheme.labelMedium
-                                  ?.copyWith(color: Colors.black),
-                            ),
-                            Text("Vamshi")
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Phone",
-                              style: theme.textTheme.labelMedium
-                                  ?.copyWith(color: Colors.black),
-                            ),
-                            Text("8639933075")
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Email",
-                              style: theme.textTheme.labelMedium
-                                  ?.copyWith(color: Colors.black),
-                            ),
-                            Text("Vamshidasari08@gmail.com")
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
+                child: Obx(() {
+                  final user = controller.user.value;
+
+                  if (controller.isLoading.value) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.error.isNotEmpty) {
+                    return Text(controller.error.value);
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Details",
+                            style: theme.textTheme.titleMedium
+                                ?.copyWith(color: Colors.red),
+                          ),
+                          IconButton(
+                              onPressed: () {
+                                final user = controller.user.value;
+                                nameController.text = user?.name ?? '';
+                                phoneController.text = user?.mobileNumber ?? '';
+                                emailController.text = user?.email ?? '';
+
+                                _showEditDialog(
+                                  context,
+                                  theme,
+                                  nameController: nameController,
+                                  emailController: emailController,
+                                  numberController: phoneController,
+                                );
+                              },
+                              icon: Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: Colors.red,
+                              ))
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Name",
+                                style: theme.textTheme.labelMedium
+                                    ?.copyWith(color: Colors.black),
+                              ),
+                              Text(user?.name ?? "NA"),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Phone",
+                                style: theme.textTheme.labelMedium
+                                    ?.copyWith(color: Colors.black),
+                              ),
+                              Text(user?.mobileNumber ?? "NA")
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Email",
+                                style: theme.textTheme.labelMedium
+                                    ?.copyWith(color: Colors.black),
+                              ),
+                              Text(user?.email ?? "")
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  );
+                }),
               ),
             ),
             SizedBox(height: 24),
@@ -213,7 +245,10 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context, ThemeData theme) {
+  void _showEditDialog(BuildContext context, ThemeData theme,
+      {required TextEditingController nameController,
+      required TextEditingController numberController,
+      required TextEditingController emailController}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -228,11 +263,12 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildTextField("Name", "Enter Name.."),
+                  _buildTextField("Name", "Enter Name..", nameController),
                   SizedBox(height: 15),
-                  _buildTextField("Phone Number", "Enter Phone Number.."),
+                  _buildTextField(
+                      "Phone Number", "Enter Phone Number..", numberController),
                   SizedBox(height: 15),
-                  _buildTextField("Email", "Enter Email.."),
+                  _buildTextField("Email", "Enter Email..", emailController),
                   SizedBox(height: 15),
                 ],
               ),
@@ -247,8 +283,24 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                final user = UserModel(
+                    name: nameController.text.trim(),
+                    email: emailController.text.trim(),
+                    mobileNumber: numberController.text.trim());
+                await controller.putUserDetails(user);
+
                 Navigator.pop(context);
+
+                ScaffoldManager.show(
+                  "Success",
+                  controller.msg.value,
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                );
+
+                controller.getUserDetails();
               },
               child: const Text("Save", style: TextStyle(color: Colors.red)),
             ),
@@ -258,7 +310,11 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTextField(String title, String hintText) {
+  Widget _buildTextField(
+    String title,
+    String hintText,
+    TextEditingController controller,
+  ) {
     return Column(
       children: [
         Column(
@@ -267,13 +323,16 @@ class ProfileScreen extends ConsumerWidget {
             Text(
               " $title",
               style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent),
             ),
             SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               height: 40,
               child: TextField(
+                controller: controller,
                 decoration: InputDecoration(
                     isDense: true,
                     border: OutlineInputBorder(

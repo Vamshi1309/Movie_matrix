@@ -1,5 +1,5 @@
 class ApiConfig {
-  static const String _baseUrl = "http://192.168.0.80:8080";
+  static const String _baseUrl = "http://192.168.0.81:8080";
 
   static String getFullImageUrl(String path) {
     // ignore: unnecessary_null_comparison
