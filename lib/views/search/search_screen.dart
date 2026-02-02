@@ -33,7 +33,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void dispose() {
-    _searchTextController.dispose();
     super.dispose();
   }
 
@@ -110,8 +109,9 @@ class _SearchScreenState extends State<SearchScreen> {
         );
       }
 
-      return ListView.builder(
+      return ListView.separated(
           itemCount: searchController.suggestions.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final movie = searchController.suggestions[index];
             return ListTile(
@@ -153,16 +153,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
         // Show error
         if (searchController.error.value.isNotEmpty) {
+          final cleanError = searchController.error.value.replaceAll("Exception: ","");
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Error: ${searchController.error.value}'),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: searchController.loadSearchData,
-                  child: Text('Retry'),
-                ),
+                Text(cleanError)
               ],
             ),
           );
@@ -184,9 +180,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 title: "Recent searches",
                 list: data.recentSearches,
                 theme: theme,
-                onDelete: (movie) {
-                  // Optional: implement delete functionality
-                },
                 onTap: searchController.onChipTap,
               ),
               SizedBox(height: AppSpacing.md),
@@ -198,9 +191,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 title: "Popular Now",
                 list: data.popularMovies,
                 theme: theme,
-                onDelete: (movie) {
-                  // Optional: implement delete functionality
-                },
                 onTap: searchController.onChipTap,
               ),
             ],
@@ -214,7 +204,6 @@ class _SearchScreenState extends State<SearchScreen> {
     required String title,
     required List<String> list,
     required ThemeData theme,
-    required Function(String) onDelete,
     required Function(String) onTap,
   }) {
     return Column(
@@ -238,12 +227,6 @@ class _SearchScreenState extends State<SearchScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              deleteIcon: Icon(
-                Icons.close,
-                color: Colors.red,
-                size: 12,
-              ),
-              onDeleted: () => onDelete(movie),
               onPressed: () => onTap(movie),
             );
           }).toList(),

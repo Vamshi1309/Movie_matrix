@@ -20,61 +20,91 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
         appBar: CustomAppBar(theme: theme),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: [
-                Obx(() {
-                  if (controller.isLoadingTrending.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (controller.errorTrending.value.isNotEmpty) {
-                    return Center(child: Text(controller.errorTrending.value));
-                  } else {
-                    return MovieCard(
-                      theme: theme,
-                      sectionHeader: "Trending",
-                      categoryId: 1,
-                      movies: controller.trendingMovies.toList(),
-                    );
-                  }
-                }),
-                SizedBox(height: AppSpacing.lg),
-                Obx(() {
-                  if (topRatedController.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (topRatedController.error.value.isNotEmpty) {
-                    return Text(topRatedController.error.value);
-                  } else {
-                    return MovieCard(
-                      theme: theme,
-                      sectionHeader: "Top Rated",
-                      categoryId: 2,
-                      movies: topRatedController.topRatedMovies.toList(),
-                    );
-                  }
-                }),
+        body: Obx(() {
+          if (allCategoriesFailed(controller, topRatedController)) {
+            return Center(
+              child: Text(
+                "No movies found",
+                style: theme.textTheme.titleMedium,
+              ),
+            );
+          }
 
-                SizedBox(height: AppSpacing.lg),
-                Obx(() {
-                  if (controller.isLoadingForYou.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (controller.errorForYou.value.isNotEmpty) {
-                    return Text(controller.errorForYou.value);
-                  } else {
-                    return MovieCard(
-                      theme: theme,
-                      sectionHeader: "For You",
-                      categoryId: 3,
-                      movies: controller.forYouMovies.toList(),
-                    );
-                  }
-                }),
-
-                SizedBox(height: AppSpacing.lg),
-              ],
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: [
+                  buildTrending(theme),
+                  SizedBox(height: AppSpacing.lg),
+                  buildTopRated(theme),
+                  SizedBox(height: AppSpacing.lg),
+                  buildForYou(theme),
+                  SizedBox(height: AppSpacing.lg),
+                ],
+              ),
             ),
-          ),
-        ));
+          );
+        }));
+  }
+
+  bool allCategoriesFailed(
+    HomeMovieController controller,
+    TopRatedController topRatedController,
+  ) {
+    return controller.errorTrending.value.isNotEmpty &&
+        topRatedController.error.value.isNotEmpty &&
+        controller.errorForYou.value.isNotEmpty;
+  }
+
+  Widget buildTopRated(ThemeData theme) {
+    return Obx(() {
+      if (topRatedController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (topRatedController.error.value.isNotEmpty) {
+        return Text("Top Rated: ${topRatedController.error.value}");
+      } else {
+        return MovieCard(
+          theme: theme,
+          sectionHeader: "Top Rated",
+          categoryId: 2,
+          movies: topRatedController.topRatedMovies.toList(),
+        );
+      }
+    });
+  }
+
+  Widget buildTrending(ThemeData theme) {
+    return Obx(() {
+      if (controller.isLoadingTrending.value) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (controller.errorTrending.value.isNotEmpty) {
+        return Text("Trending: ${controller.errorTrending.value}");
+      } else {
+        return MovieCard(
+          theme: theme,
+          sectionHeader: "Trending",
+          categoryId: 1,
+          movies: controller.trendingMovies.toList(),
+        );
+      }
+    });
+  }
+
+  Widget buildForYou(ThemeData theme) {
+    return Obx(() {
+      if (controller.isLoadingForYou.value) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (controller.errorForYou.value.isNotEmpty) {
+        return Text("For You: ${controller.errorForYou.value}");
+      } else {
+        return MovieCard(
+          theme: theme,
+          sectionHeader: "For You",
+          categoryId: 3,
+          movies: controller.forYouMovies.toList(),
+        );
+      }
+    });
   }
 }

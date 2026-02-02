@@ -1,32 +1,23 @@
 // services/auth_service.dart
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:movie_matrix/core/utils/api_config.dart';
+import 'package:movie_matrix/core/network/api_service.dart';
 import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/auth_model.dart';
+import 'package:movie_matrix/services/storage_service.dart';
 
 class AuthService {
-  final baseUrl = '${ApiConfig.baseUrl}/api/auth';
-  final storage = const FlutterSecureStorage();
-  final appLogger = AppLogger();
+  final baseUrl = '/auth';
 
-  // Configure Dio with proper timeouts
-  final dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      sendTimeout: const Duration(seconds: 10),
-    ),
-  );
-
-  Future<AuthModel> register(String email, String password) async {
+  Future<AuthModel> register(String? name, String? number, email, String password) async {
     try {
       AppLogger.i("Registering email: $email");
       AppLogger.i("URL: $baseUrl/register");
 
-      final response = await dio.post(
+      final response = await ApiService.dio.post(
         '$baseUrl/register',
         data: {
+          'name' : name,
+          'mobileNumber' : number,
           'email': email,
           'password': password,
         },
@@ -41,7 +32,7 @@ class AuthService {
         final message = response.data['message'];
         final token = response.data['data']['token'];
 
-        await storage.write(key: 'auth_token', value: token);
+        await StorageService.saveToken(token);
         AppLogger.i('Registration successful, token saved');
         return AuthModel(
           message: message,
@@ -94,7 +85,7 @@ class AuthService {
       AppLogger.i("Login email: $email");
       AppLogger.i("URL: $baseUrl/login");
 
-      final response = await dio.post(
+      final response = await ApiService.dio.post(
         '$baseUrl/login',
         data: {
           'email': email,
@@ -110,7 +101,7 @@ class AuthService {
       if (response.statusCode == 200) {
         final message = response.data['message'];
         final token = response.data['data']['token'];
-        await storage.write(key: 'auth_token', value: token);
+        await StorageService.saveToken(token);
         AppLogger.i('Login successful, token saved');
         return AuthModel(
           message: message,
@@ -159,8 +150,8 @@ class AuthService {
   }
 
   Future<String?> getToken() async {
-    return await storage.read(key: 'auth_token');
-  }
+  return StorageService.getToken();
+}
 
   Future<bool> isAuthenticated() async {
     final token = await getToken();
@@ -169,7 +160,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
-    await storage.delete(key: 'auth_token');
-    AppLogger.i('👋 User logged out, token deleted');
-  }
+  await StorageService.clearToken();
+  AppLogger.i('👋 User logged out, token deleted');
+}
 }

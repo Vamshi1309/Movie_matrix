@@ -1,42 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:movie_matrix/core/utils/api_config.dart';
+import 'package:movie_matrix/core/network/api_service.dart';
 import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 
 class MovieService {
-  final Dio dio;
-  final FlutterSecureStorage storage = const FlutterSecureStorage();
 
-  MovieService()
-      : dio = Dio(
-          BaseOptions(
-              baseUrl: '${ApiConfig.baseUrl}/api/movies',
-              connectTimeout: const Duration(seconds: 10),
-              receiveTimeout: const Duration(seconds: 10),
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-              }),
-        ) {
-    dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (options, handler) async {
-      final token = await storage.read(key: 'auth_token');
+  final Dio dio = ApiService.dio;
 
-      if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
-        AppLogger.i('🔑 Token attached to request');
-      } else {
-        AppLogger.w('⚠️ No token available');
-      }
-      return handler.next(options);
-    }));
-  }
+  final String baseUrl = "/movies";
 
   Future<List<MovieModel>> getTrendingMovies() async {
     try {
       AppLogger.i('📡 Fetching trending movies...');
-      final response = await dio.get('/trending');
+      final response = await dio.get('$baseUrl/trending');
       AppLogger.i('✅ Trending movies fetched successfully');
 
       final data = response.data["data"];
@@ -76,7 +52,7 @@ class MovieService {
   Future<List<MovieModel>> getNowPlayingMovies() async {
     try {
       AppLogger.i('📡 Fetching now playing movies...');
-      final response = await dio.get('/now-playing');
+      final response = await dio.get('$baseUrl/now-playing');
       AppLogger.i('✅ Now playing movies fetched successfully');
 
       final data = response.data["data"];
@@ -116,7 +92,7 @@ class MovieService {
   Future<List<MovieModel>> getPopularMovies() async {
     try {
       AppLogger.i('📡 Fetching popular movies...');
-      final response = await dio.get('/popular');
+      final response = await dio.get('$baseUrl/popular');
       AppLogger.i('✅ Popular movies fetched successfully');
 
       final data = response.data["data"];
@@ -155,7 +131,7 @@ class MovieService {
   Future<List<MovieModel>> getTopRatedMovies() async {
     try {
       AppLogger.i('📡 Fetching top rated movies...');
-      final response = await dio.get('/top-rated');
+      final response = await dio.get('$baseUrl/top-rated');
       AppLogger.i('✅ Top rated movies fetched successfully');
 
       final data = response.data["data"];
@@ -194,7 +170,7 @@ class MovieService {
   Future<List<MovieModel>> getForYouMovies() async {
     try {
       AppLogger.i('📡 Fetching for you movies...');
-      final response = await dio.get('/for-you');
+      final response = await dio.get('$baseUrl/for-you');
       AppLogger.i('✅ For you movies fetched successfully');
 
       final data = response.data["data"];

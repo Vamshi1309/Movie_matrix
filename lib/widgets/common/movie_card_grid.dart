@@ -21,7 +21,9 @@ class MovieCardGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return movies.length == 0
-        ? Center(child: Text("No movies available", style: theme.textTheme.bodyMedium))
+        ? Center(
+            child:
+                Text("No movies available", style: theme.textTheme.bodyMedium))
         : Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SingleChildScrollView(
@@ -60,13 +62,15 @@ class MovieCardGrid extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 12.0),
                         child: BuildMovieCard(
                           theme: theme,
-                          imgUrl: ApiConfig.getFullImageUrl(movieData.posterUrl),
+                          imgUrl:
+                              ApiConfig.getFullImageUrl(movieData.posterUrl),
                           title: movieData.title,
                           rating: movieData.rating,
                         ),
                       );
                     }),
                   ),
+                  const SizedBox(height: 50),
                 ],
               ),
             ),

@@ -23,7 +23,8 @@ class MovieListScreen extends StatelessWidget {
     }
 
     if (error.isNotEmpty) {
-      return Center(child: Text(error, style: theme.textTheme.bodyMedium));
+      final cleanError = error.replaceFirst('Exception: ', '');
+      return Center(child: Text(cleanError, style: theme.textTheme.bodyMedium));
     }
 
     if (movies.isEmpty) {

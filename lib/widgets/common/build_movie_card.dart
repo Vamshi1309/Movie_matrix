@@ -31,7 +31,7 @@ class BuildMovieCard extends StatelessWidget {
                   imageUrl: imgUrl!,
                   width: double.infinity,
                   height: 120,
-                  // Reduced height to fit content
+                  alignment: Alignment.topCenter,
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
                     width: double.infinity,

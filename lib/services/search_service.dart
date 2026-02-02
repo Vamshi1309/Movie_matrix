@@ -1,45 +1,19 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:movie_matrix/core/network/api_service.dart';
 import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/data/models/response/api_response.dart';
 import 'package:movie_matrix/data/models/response/search_response.dart';
-
 class SearchService {
-  static final String baseUrl = ApiConfig.baseUrl;
-
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: '${baseUrl}/api/search',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    ),
-  );
-
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
-
-  SearchService() {
-    // Add interceptor to attach JWT token
-    _dio.interceptors.add(
-      InterceptorsWrapper(onRequest: (options, handler) async {
-        final token = await _storage.read(key: 'auth_token');
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-          AppLogger.i('🔑 JWT token attached to request');
-        } else {
-          AppLogger.w('⚠️ No JWT token available');
-        }
-        handler.next(options);
-      }),
-    );
-  }
+  final Dio _dio = ApiService.dio;
+  final String baseUrl = '/search';
 
   Future<SearchResponse> getSearchData() async {
     try {
       AppLogger.i('📡 Fetching search data...');
       final response = await _dio.get(
-        '/data',
+        '$baseUrl/data',
         queryParameters: {'userId': ApiConfig.userId},
       );
       AppLogger.i('✅ Search data fetched successfully');
@@ -66,7 +40,7 @@ class SearchService {
     try {
       AppLogger.i('📡 Fetching suggestions for "$query"...');
       final response = await _dio.get(
-        '/suggestions',
+        '$baseUrl/suggestions',
         queryParameters: {'query': query},
       );
       AppLogger.i('✅ Suggestions fetched successfully');
@@ -93,7 +67,7 @@ class SearchService {
     try {
       AppLogger.i('📡 Fetching movie details for "$title"...');
       final response = await _dio.get(
-        '/movie',
+        '$baseUrl/movie',
         queryParameters: {'title': title, 'userId': ApiConfig.userId},
       );
       AppLogger.i('✅ Movie "$title" fetched successfully');

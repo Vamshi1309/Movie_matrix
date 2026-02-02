@@ -26,6 +26,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   final _loginPasswordController = TextEditingController();
   final _registerEmailController = TextEditingController();
   final _registerPasswordController = TextEditingController();
+  final _registerNameController = TextEditingController();
+  final _registerNumberController = TextEditingController();
 
   @override
   void initState() {
@@ -55,7 +57,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     final password = _loginPasswordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      // Use ScaffoldMessenger instead of Get.snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill all fields'),
@@ -66,40 +67,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
 
     try {
-      final data = await ref.read(authProvider.notifier).login(email, password);
+      final authData =
+          await ref.read(authProvider.notifier).login(email, password);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(data.message),
+          content: Text(authData.message),
           backgroundColor: Colors.green,
         ),
       );
-
       await Future.delayed(const Duration(milliseconds: 600));
       Get.offAll(() => MainScreen());
     } catch (e) {
-      if (mounted) {
-        String errorMessage = e.toString();
+      if (!mounted) return;
+      final authState = ref.read(authProvider);
+      final errorMessage =
+          authState.error ?? e.toString().replaceFirst('Exception: ', '');
 
-        // Remove "Exception: " prefix if present
-        if (errorMessage.startsWith('Exception: ')) {
-          errorMessage = errorMessage.substring(11);
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login Failed: ${errorMessage}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   Future<void> _handleRegister() async {
     final email = _registerEmailController.text.trim();
     final password = _registerPasswordController.text.trim();
+    final name = _registerNameController.text.trim();
+    final number = _registerNumberController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,33 +112,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
 
     try {
-      final data =
-          await ref.read(authProvider.notifier).register(email, password);
+      final authData = await ref
+          .read(authProvider.notifier)
+          .register(name, number, email, password);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(data.message),
+          content: Text(authData.message),
           backgroundColor: Colors.green,
         ),
       );
-
       await Future.delayed(const Duration(milliseconds: 600));
       Get.offAll(() => MainScreen());
     } catch (e) {
-      if (mounted) {
-        String errorMessage = e.toString();
-        if (errorMessage.startsWith('Exception: ')) {
-          errorMessage = errorMessage.substring(11);
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Registration Failed: ${errorMessage}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      final authState = ref.read(authProvider);
+      final errorMessage =
+          authState.error ?? e.toString().replaceFirst('Exception: ', '');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -201,6 +201,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               isLogin: false,
                               emailController: _registerEmailController,
                               passwordController: _registerPasswordController,
+                              nameController: _registerNameController,
+                              numberController: _registerNumberController,
                               onSubmit: _handleRegister)
                         ]),
                       )
@@ -229,49 +231,69 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     bool isLogin = true,
     required TextEditingController emailController,
     required TextEditingController passwordController,
+    TextEditingController? nameController,
+    TextEditingController? numberController,
     required VoidCallback onSubmit,
   }) {
-    return Column(
-      children: [
-        _buildInputField(
-            title: "Email",
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          if (!isLogin) ...[
+            _buildInputField(
+                title: "Name",
+                theme: theme,
+                labelText: "Enter your Name",
+                controller: nameController!,
+                keyboardType: TextInputType.emailAddress),
+            SizedBox(height: 20),
+            _buildInputField(
+                title: "Mobile Number",
+                theme: theme,
+                labelText: "Enter your Mobile number",
+                controller: numberController!,
+                keyboardType: TextInputType.number),
+            SizedBox(height: 20),
+          ],
+          _buildInputField(
+              title: "Email",
+              theme: theme,
+              labelText: "Enter your Email",
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress),
+          SizedBox(height: 20),
+          _buildInputField(
+            title: "Password",
             theme: theme,
-            labelText: "Enter your Email",
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress),
-        SizedBox(height: 20),
-        _buildInputField(
-          title: "Password",
-          theme: theme,
-          labelText: "Enter your Password",
-          controller: passwordController,
-          obscureText: true,
-        ),
-        SizedBox(height: 10),
-        if (isLogin) ...[
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Text(
-              "Forgot Password?",
-              style: theme.textTheme.labelMedium,
-            ),
+            labelText: "Enter your Password",
+            controller: passwordController,
+            obscureText: true,
           ),
-        ] else ...[
-          SizedBox(height: 10)
+          SizedBox(height: 10),
+          if (isLogin) ...[
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                "Forgot Password?",
+                style: theme.textTheme.labelMedium,
+              ),
+            ),
+          ] else ...[
+            SizedBox(height: 10)
+          ],
+          SizedBox(height: 20),
+          _buildButton(
+            title: isLogin ? "Log in" : "Register",
+            onPressed: onSubmit,
+          ),
+          SizedBox(height: 20),
+          _buildButton(
+            title: "Continue as guest",
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.grey.shade300,
+            onPressed: _handleGuestMode,
+          ),
         ],
-        SizedBox(height: 20),
-        _buildButton(
-          title: isLogin ? "Log in" : "Register",
-          onPressed: onSubmit,
-        ),
-        SizedBox(height: 20),
-        _buildButton(
-          title: "Continue as guest",
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.grey.shade300,
-          onPressed: _handleGuestMode,
-        ),
-      ],
+      ),
     );
   }
 

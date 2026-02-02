@@ -1,3 +1,5 @@
+import 'dart:math' as Math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movie_matrix/core/utils/api_config.dart';
@@ -23,6 +25,18 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    for (var i = 0; i < Math.min(3, movies.length); i++) {
+      final movie = movies[i];
+      final posterUrl = movie.posterUrl;
+      final fullUrl = ApiConfig.getFullImageUrl(posterUrl);
+      print('DEBUG Movie ${i + 1}:');
+      print('  Title: ${movie.title}');
+      print('  Poster URL from API: "$posterUrl"');
+      print('  Is null: ${posterUrl == null}');
+      print('  Is empty: ${posterUrl?.isEmpty ?? true}');
+      print('  Full URL: "$fullUrl"');
+    }
+
     final displayMovies = movies.length > 10 ? movies.sublist(0, 10) : movies;
 
     return Padding(

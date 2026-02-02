@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:movie_matrix/controllers/browse%20controller/browse_controller.dart';
 import 'package:movie_matrix/controllers/home%20controller/home_controller.dart';
 import 'package:movie_matrix/controllers/top%20rated%20movies%20controller/top_rated_controller.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';

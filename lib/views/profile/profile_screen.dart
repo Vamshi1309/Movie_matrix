@@ -14,182 +14,282 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Get.put(ThemeController()).themeData;
 
     return Scaffold(
-      appBar: CustomAppBar(theme: theme),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Profile",
-                style: theme.textTheme.headlineMedium,
-              ),
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    child: Image.asset('assets/images/Vamshi_Passport.jpg',
-                        height: 70, width: 70),
-                  ),
-                  SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Vamshi",
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Enjoy latest movie recommendations..",
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(color: Colors.grey[600]),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              SizedBox(height: 24),
-              Card(
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Details",
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(color: Colors.red),
-                      ),
-                      SizedBox(height: 10),
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Name",
-                                style: theme.textTheme.labelMedium
-                                    ?.copyWith(color: Colors.black),
-                              ),
-                              Text("Vamshi")
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Phone",
-                                style: theme.textTheme.labelMedium
-                                    ?.copyWith(color: Colors.black),
-                              ),
-                              Text("8639933075")
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Email",
-                                style: theme.textTheme.labelMedium
-                                    ?.copyWith(color: Colors.black),
-                              ),
-                              Text("Vamshidasari08@gmail.com")
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 24),
-              Card(
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Account",
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(color: Colors.red),
-                      ),
-                      SizedBox(height: 10),
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Log in/ Sign Up",
-                                style: theme.textTheme.labelMedium
-                                    ?.copyWith(color: Colors.black),
-                              ),
-                              Text("Signed In")
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "About App",
-                                style: theme.textTheme.labelMedium
-                                    ?.copyWith(color: Colors.black),
-                              ),
-                              Text("v1.0.1")
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 40,
-                child: ElevatedButton(
-                    onPressed: () {
-                      ref.read(authProvider.notifier).logout();
-                      Get.offAll(() => LoginScreen());
+        appBar: CustomAppBar(theme: theme),
+        body: _buildBody(theme: theme, ref: ref, context: context));
+  }
 
-                      Get.snackbar(
-                        'Logged Out',
-                        'You have been logged out successfully',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.green,
-                        colorText: Colors.white,
-                        duration: Duration(seconds: 2),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+  Widget _buildBody(
+      {required ThemeData theme,
+      required WidgetRef ref,
+      required BuildContext context}) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Profile",
+              style: theme.textTheme.headlineMedium,
+            ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: Image.asset('assets/images/Vamshi_Passport.jpg',
+                      height: 70, width: 70),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Vamshi",
+                      style: theme.textTheme.titleMedium,
                     ),
-                    child: Text(
-                      "Logout",
-                      style: TextStyle(
-                        color: theme.colorScheme.onPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )),
-              )
-            ],
-          ),
+                    SizedBox(height: 5),
+                    Text(
+                      "Enjoy latest movie recommendations..",
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(color: Colors.grey[600]),
+                    ),
+                  ],
+                )
+              ],
+            ),
+            SizedBox(height: 24),
+            Card(
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Details",
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(color: Colors.red),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              _showEditDialog(context, theme);
+                            },
+                            icon: Icon(
+                              Icons.edit,
+                              size: 18,
+                              color: Colors.red,
+                            ))
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Name",
+                              style: theme.textTheme.labelMedium
+                                  ?.copyWith(color: Colors.black),
+                            ),
+                            Text("Vamshi")
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Phone",
+                              style: theme.textTheme.labelMedium
+                                  ?.copyWith(color: Colors.black),
+                            ),
+                            Text("8639933075")
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Email",
+                              style: theme.textTheme.labelMedium
+                                  ?.copyWith(color: Colors.black),
+                            ),
+                            Text("Vamshidasari08@gmail.com")
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            Card(
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Account",
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(color: Colors.red),
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Log in/ Sign Up",
+                              style: theme.textTheme.labelMedium
+                                  ?.copyWith(color: Colors.black),
+                            ),
+                            Text("Signed In")
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "About App",
+                              style: theme.textTheme.labelMedium
+                                  ?.copyWith(color: Colors.black),
+                            ),
+                            Text("v1.0.1")
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: ElevatedButton(
+                  onPressed: () {
+                    ref.read(authProvider.notifier).logout();
+                    Get.offAll(() => LoginScreen());
+
+                    Get.snackbar(
+                      'Logged Out',
+                      'You have been logged out successfully',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                      duration: Duration(seconds: 2),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    "Logout",
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+            )
+          ],
         ),
       ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            "Edit Profile",
+            style: TextStyle(color: Colors.red),
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.85,
+            child: Form(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildTextField("Name", "Enter Name.."),
+                  SizedBox(height: 15),
+                  _buildTextField("Phone Number", "Enter Phone Number.."),
+                  SizedBox(height: 15),
+                  _buildTextField("Email", "Enter Email.."),
+                  SizedBox(height: 15),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Save", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTextField(String title, String hintText) {
+    return Column(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              " $title",
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold, color: Colors.redAccent),
+            ),
+            SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: TextField(
+                decoration: InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderSide: BorderSide(width: 2, color: Colors.red),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    hintText: hintText),
+              ),
+            )
+          ],
+        ),
+      ],
     );
   }
 }
