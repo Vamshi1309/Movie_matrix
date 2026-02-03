@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/themes/app_spacing.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ThemeData theme;
-  final bool showSubTitle;
+  final bool isLoginScreen;
 
-  const CustomAppBar({super.key, required this.theme, this.showSubTitle = false});
+  const CustomAppBar(
+      {super.key, required this.theme, this.isLoginScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +53,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
                   'Movie Matrix',
                   style: theme.textTheme.titleLarge,
                 ),
-                Opacity(
-                  opacity: showSubTitle ? 1.0 : 0.0,
-                  child: Text(
-                    "Tonight's picks for you..",
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                Text(
+                  isLoginScreen
+                      ? "Login to explore movies"
+                      : "Explore Tollywood Movies..",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
                   ),
                 ),
               ],

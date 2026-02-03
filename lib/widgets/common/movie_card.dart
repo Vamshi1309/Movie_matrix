@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/views/home/all_movies_screen.dart';
+import 'package:movie_matrix/views/movie/movie_detail_screen.dart';
 import 'package:movie_matrix/widgets/common/build_movie_card.dart';
 import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/app_spacing.dart';
@@ -25,18 +26,6 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    for (var i = 0; i < Math.min(3, movies.length); i++) {
-      final movie = movies[i];
-      final posterUrl = movie.posterUrl;
-      final fullUrl = ApiConfig.getFullImageUrl(posterUrl);
-      print('DEBUG Movie ${i + 1}:');
-      print('  Title: ${movie.title}');
-      print('  Poster URL from API: "$posterUrl"');
-      print('  Is null: ${posterUrl == null}');
-      print('  Is empty: ${posterUrl?.isEmpty ?? true}');
-      print('  Full URL: "$fullUrl"');
-    }
-
     final displayMovies = movies.length > 10 ? movies.sublist(0, 10) : movies;
 
     return Padding(
@@ -107,11 +96,16 @@ class MovieCard extends StatelessWidget {
                 final movie = displayMovies[index];
                 return Padding(
                   padding: const EdgeInsets.only(right: 12.0),
-                  child: BuildMovieCard(
-                    theme: theme,
-                    imgUrl: ApiConfig.getFullImageUrl(movie.posterUrl),
-                    title: movie.title,
-                    rating: movie.rating,
+                  child: GestureDetector(
+                    onTap: (){
+                      Get.to(MovieDetailsScreen(movieName: movie.title));
+                    },
+                    child: BuildMovieCard(
+                      theme: theme,
+                      imgUrl: ApiConfig.getFullImageUrl(movie.posterUrl),
+                      title: movie.title,
+                      rating: movie.rating,
+                    ),
                   ),
                 );
               },

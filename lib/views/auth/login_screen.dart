@@ -21,6 +21,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     with SingleTickerProviderStateMixin {
   bool isLoginState = true;
   late TabController _tabController;
+  bool showPassword = true;
 
   final _loginEmailController = TextEditingController();
   final _loginPasswordController = TextEditingController();
@@ -152,7 +153,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: CustomAppBar(theme: theme),
+      appBar: CustomAppBar(
+        theme: theme,
+        isLoginScreen: true,
+      ),
       body: Stack(
         children: [
           Padding(
@@ -264,9 +268,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           _buildInputField(
             title: "Password",
             theme: theme,
+            isPassword: true,
             labelText: "Enter your Password",
             controller: passwordController,
-            obscureText: true,
+            obscureText: showPassword ? true : false,
           ),
           SizedBox(height: 10),
           if (isLogin) ...[
@@ -318,6 +323,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   Widget _buildInputField({
     required ThemeData theme,
+    bool isPassword = false,
     required String title,
     required String labelText,
     required TextEditingController controller,
@@ -340,18 +346,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           obscureText: obscureText,
           keyboardType: keyboardType,
           decoration: InputDecoration(
-            hintText: labelText,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: AppColors.primary, width: 2),
-            ),
-          ),
+              hintText: labelText,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
+              ),
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(Icons.remove_red_eye_outlined),
+                      color: Colors.red,
+                      onPressed: () {
+                        setState(() {
+                          showPassword = !showPassword;
+                        });
+                      },
+                    )
+                  : null),
         )
       ],
     );

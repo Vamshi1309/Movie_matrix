@@ -88,7 +88,8 @@ class MovieSearchController extends GetxController {
 
       if (movie != null) {
         // Navigate to movie details screen
-        final result = await Get.to(() => MovieDetailsScreen());
+        final result = await Get.to(
+            () => MovieDetailsScreen(movieName: searchQuery.value));
 
         // Refresh search data when coming back
         if (result == true || result == null) {

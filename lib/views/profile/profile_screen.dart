@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// fluttertoast removed: using Get.snackbar for in-app feedback
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
@@ -288,18 +289,24 @@ class ProfileScreen extends ConsumerWidget {
                     name: nameController.text.trim(),
                     email: emailController.text.trim(),
                     mobileNumber: numberController.text.trim());
+
                 await controller.putUserDetails(user);
 
-                Navigator.pop(context);
+                // Close dialog
+                Navigator.of(context).pop();
 
-                ScaffoldManager.show(
-                  "Success",
-                  controller.msg.value,
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
+                // Show snackbar using ScaffoldMessenger (more reliable with Navigator dialogs)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(controller.msg.value),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.all(10),
+                  ),
                 );
 
+                // Refresh user details
                 controller.getUserDetails();
               },
               child: const Text("Save", style: TextStyle(color: Colors.red)),
