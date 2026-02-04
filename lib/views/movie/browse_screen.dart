@@ -49,6 +49,8 @@ class BrowseScreen extends StatelessWidget {
                         movies: controller.popularMovies,
                         isLoading: controller.isLoadingPopular.value,
                         error: controller.errorPopular.value,
+                        onLoadMore: () =>
+                            controller.fetchPopularMovies(loadMore: true),
                       );
                     }),
 
@@ -59,6 +61,8 @@ class BrowseScreen extends StatelessWidget {
                         movies: controller.nowPlayingMovies,
                         isLoading: controller.isLoadingNowPlaying.value,
                         error: controller.errorNowPlaying.value,
+                        onLoadMore: () =>
+                            controller.fetchNowPlayingMovies(loadMore: true),
                       );
                     }),
 
@@ -69,6 +73,8 @@ class BrowseScreen extends StatelessWidget {
                         movies: topRatedController.topRatedMovies,
                         isLoading: topRatedController.isLoading.value,
                         error: topRatedController.error.value,
+                        onLoadMore: () => topRatedController
+                            .fetchTopRatedMovies(loadMore: true),
                       );
                     }),
                   ],

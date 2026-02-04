@@ -6,13 +6,16 @@ class BrowseMovieController extends GetxController {
   final MovieService _movieService = MovieService();
 
   var popularMovies = <MovieModel>[].obs;
-  var nowPlayingMovies = <MovieModel>[].obs;
-
   var isLoadingPopular = false.obs;
-  var isLoadingNowPlaying = false.obs;
-
   var errorPopular = ''.obs;
+  var popularPage = 0.obs;
+  var popularHasNext = true.obs;
+
+  var nowPlayingMovies = <MovieModel>[].obs;
+  var isLoadingNowPlaying = false.obs;
   var errorNowPlaying = ''.obs;
+  var nowPlayingPage = 0.obs;
+  var nowPlayingHasNext = true.obs;
 
   @override
   void onInit() {
@@ -21,11 +24,33 @@ class BrowseMovieController extends GetxController {
     fetchNowPlayingMovies();
   }
 
-  void fetchPopularMovies() async {
+  void fetchPopularMovies({bool loadMore = false}) async {
+    if (isLoadingPopular.value) return;
+    if (loadMore && !popularHasNext.value) return;
+
     try {
       isLoadingPopular.value = true;
       errorPopular.value = '';
-      popularMovies.value = await _movieService.getPopularMovies();
+
+      if (!loadMore) {
+        popularPage.value = 0;
+        popularMovies.clear();
+      }
+
+      final result = await _movieService.getPopularMovies(
+          page: popularPage.value, limit: 5);
+
+      final movies = result['movies'] as List<MovieModel>;
+
+      if (loadMore) {
+        popularMovies.addAll(movies);
+      } else {
+        popularMovies.value = movies;
+      }
+      popularHasNext.value = result['hasNext'] as bool;
+      if (popularHasNext.value) {
+        popularPage.value++;
+      }
     } catch (e) {
       errorPopular.value = e.toString();
     } finally {
@@ -33,11 +58,36 @@ class BrowseMovieController extends GetxController {
     }
   }
 
-  void fetchNowPlayingMovies() async {
+  void fetchNowPlayingMovies({bool loadMore = false}) async {
+    if (isLoadingNowPlaying.value) return;
+    if (loadMore && !nowPlayingHasNext.value) return;
+
     try {
       isLoadingNowPlaying.value = true;
       errorNowPlaying.value = '';
-      nowPlayingMovies.value = await _movieService.getNowPlayingMovies();
+
+      if (!loadMore) {
+        nowPlayingPage.value = 0;
+        nowPlayingMovies.clear();
+      }
+
+      final result = await _movieService.getNowPlayingMovies(
+        page: nowPlayingPage.value,
+        limit: 5,
+      );
+
+      final movies = result['movies'] as List<MovieModel>;
+
+      if (loadMore) {
+        nowPlayingMovies.addAll(movies);
+      } else {
+        nowPlayingMovies.value = movies;
+      }
+
+      nowPlayingHasNext.value = result['hasNext'] as bool;
+      if (nowPlayingHasNext.value) {
+        nowPlayingPage.value++;
+      }
     } catch (e) {
       errorNowPlaying.value = e.toString();
     } finally {

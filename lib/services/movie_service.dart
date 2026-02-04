@@ -4,7 +4,6 @@ import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 
 class MovieService {
-
   final Dio dio = ApiService.dio;
 
   final String baseUrl = "/movies";
@@ -49,24 +48,33 @@ class MovieService {
     }
   }
 
-  Future<List<MovieModel>> getNowPlayingMovies() async {
+  Future<Map<String, dynamic>> getNowPlayingMovies({
+    int page = 0,
+    int limit = 5,
+  }) async {
     try {
       AppLogger.i('📡 Fetching now playing movies...');
-      final response = await dio.get('$baseUrl/now-playing');
+      final response = await dio.get('$baseUrl/now-playing',
+          queryParameters: {'page': page, 'limit': limit});
       AppLogger.i('✅ Now playing movies fetched successfully');
 
-      final data = response.data["data"];
-
+      final data = response.data["data"]["content"];
       if (data is List) {
-        return data.map((e) {
+        final movies = data.map((e) {
           if (e is Map<String, dynamic>) {
             return MovieModel.fromJson(e);
           } else {
             throw Exception('Invalid movie data format');
           }
         }).toList();
+
+        return {
+          'movies': movies,
+          'totalPages': response.data["data"]['totalPages'],
+          'hasNext': response.data["data"]['last'] == false,
+        };
       } else {
-        throw Exception('Unexpected response format: ${data.runtimeType}');
+        throw Exception('Unexpected response format');
       }
     } on DioException catch (e) {
       AppLogger.e('❌ Now playing movies error: ${e.type}');
@@ -89,21 +97,31 @@ class MovieService {
     }
   }
 
-  Future<List<MovieModel>> getPopularMovies() async {
+  Future<Map<String, dynamic>> getPopularMovies({
+    int page = 0,
+    int limit = 5,
+  }) async {
     try {
       AppLogger.i('📡 Fetching popular movies...');
-      final response = await dio.get('$baseUrl/popular');
+      final response = await dio.get('$baseUrl/popular',
+          queryParameters: {'page': page, 'limit': limit});
       AppLogger.i('✅ Popular movies fetched successfully');
 
-      final data = response.data["data"];
+      final data = response.data["data"]["content"];
       if (data is List) {
-        return data.map((e) {
+        final movies = data.map((e) {
           if (e is Map<String, dynamic>) {
             return MovieModel.fromJson(e);
           } else {
             throw Exception('Invalid movie data format');
           }
         }).toList();
+
+        return {
+          'movies': movies,
+          'totalPages': response.data["data"]['totalPages'],
+          'hasNext': response.data["data"]['last'] == false,
+        };
       } else {
         throw Exception('Unexpected response format');
       }
@@ -128,21 +146,31 @@ class MovieService {
     }
   }
 
-  Future<List<MovieModel>> getTopRatedMovies() async {
+  Future<Map<String, dynamic>> getTopRatedMovies({
+    int page = 0,
+    int limit = 5,
+  }) async {
     try {
       AppLogger.i('📡 Fetching top rated movies...');
-      final response = await dio.get('$baseUrl/top-rated');
+      final response = await dio.get('$baseUrl/top-rated',
+          queryParameters: {'page': page, 'limit': limit});
       AppLogger.i('✅ Top rated movies fetched successfully');
 
-      final data = response.data["data"];
+      final data = response.data["data"]["content"];
       if (data is List) {
-        return data.map((e) {
+        final movies = data.map((e) {
           if (e is Map<String, dynamic>) {
             return MovieModel.fromJson(e);
           } else {
             throw Exception('Invalid movie data format');
           }
         }).toList();
+
+        return {
+          'movies': movies,
+          'totalPages': response.data["data"]['totalPages'],
+          'hasNext': response.data["data"]['last'] == false,
+        };
       } else {
         throw Exception('Unexpected response format');
       }
@@ -150,7 +178,7 @@ class MovieService {
       AppLogger.e('❌ Top rated movies error: ${e.type}');
       AppLogger.e('Response data type: ${e.response?.data.runtimeType}');
       AppLogger.e('Response data: ${e.response?.data}');
-      // FIX: Handle both Map and String error responses
+
       String errorMessage = 'Failed to fetch top rated movies';
 
       if (e.response?.data != null) {

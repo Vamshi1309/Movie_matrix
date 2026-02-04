@@ -6,47 +6,87 @@ import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/views/movie/movie_detail_screen.dart';
 
-class MovieListScreen extends StatelessWidget {
+class MovieListScreen extends StatefulWidget {
   final ThemeData theme;
   final List<MovieModel> movies;
   final bool isLoading;
   final String error;
+  final VoidCallback? onLoadMore;
 
-  MovieListScreen(
-      {super.key,
-      required this.theme,
-      required this.movies,
-      required this.isLoading,
-      required this.error});
+  MovieListScreen({
+    super.key,
+    required this.theme,
+    required this.movies,
+    required this.isLoading,
+    required this.error,
+    this.onLoadMore,
+  });
+
+  @override
+  State<MovieListScreen> createState() => _MovieListScreenState();
+}
+
+class _MovieListScreenState extends State<MovieListScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.9) {
+      widget.onLoadMore?.call();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (widget.isLoading && widget.movies.isEmpty) {
       return Center(child: CircularProgressIndicator());
     }
 
-    if (error.isNotEmpty) {
-      final cleanError = error.replaceFirst('Exception: ', '');
-      return Center(child: Text(cleanError, style: theme.textTheme.bodyMedium));
+    if (widget.error.isNotEmpty && widget.movies.isEmpty) {
+      final cleanError = widget.error.replaceFirst('Exception: ', '');
+      return Center(
+          child: Text(cleanError, style: widget.theme.textTheme.bodyMedium));
     }
 
-    if (movies.isEmpty) {
+    if (widget.movies.isEmpty) {
       return Center(
-          child:
-              Text("No movies available", style: theme.textTheme.bodyMedium));
+          child: Text("No movies available",
+              style: widget.theme.textTheme.bodyMedium));
     }
 
     return Container(
         width: double.infinity,
         child: ListView.builder(
-            itemCount: movies.length,
+            controller: _scrollController,
+            itemCount: widget.movies.length + (widget.isLoading ? 1 : 0),
             itemBuilder: (context, index) {
+              if (index == widget.movies.length) {
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
               return Column(
                 children: [
                   SizedBox(height: 18),
                   GestureDetector(
-                    onTap: (){
-                      Get.to(MovieDetailsScreen(movieName: movies[index].title));
+                    onTap: () {
+                      Get.to(MovieDetailsScreen(
+                          movieName: widget.movies[index].title));
                     },
                     child: Card(
                       elevation: 5,
@@ -60,8 +100,8 @@ class MovieListScreen extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: CachedNetworkImage(
-                                imageUrl:
-                                    ApiConfig.getFullImageUrl(movies[index].posterUrl),
+                                imageUrl: ApiConfig.getFullImageUrl(
+                                    widget.movies[index].posterUrl),
                                 height: 110,
                                 // Adjusted height
                                 width: 80,
@@ -86,9 +126,9 @@ class MovieListScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                    
+
                             SizedBox(width: 22),
-                    
+
                             // Movie Details
                             Expanded(
                               child: Column(
@@ -103,11 +143,13 @@ class MovieListScreen extends StatelessWidget {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          movies[index].title,
-                                          style: theme.textTheme.titleLarge
+                                          widget.movies[index].title,
+                                          style: widget
+                                              .theme.textTheme.titleLarge
                                               ?.copyWith(
                                                   fontWeight: FontWeight.bold,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   fontSize: 16),
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
@@ -121,8 +163,9 @@ class MovieListScreen extends StatelessWidget {
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        movies[index].rating.toString(),
-                                        style: theme.textTheme.titleMedium
+                                        widget.movies[index].rating.toString(),
+                                        style: widget
+                                            .theme.textTheme.titleMedium
                                             ?.copyWith(
                                                 fontWeight: FontWeight.bold,
                                                 overflow: TextOverflow.ellipsis,
@@ -130,23 +173,25 @@ class MovieListScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                    
+
                                   SizedBox(height: 8),
-                    
+
                                   // Year, Genre, Duration
                                   Text(
-                                    "${movies[index].releaseYear} · ${movies[index].genre} · ${movies[index].duration} mins",
-                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                    "${widget.movies[index].releaseYear} · ${widget.movies[index].genre} · ${widget.movies[index].duration} mins",
+                                    style: widget.theme.textTheme.bodyMedium
+                                        ?.copyWith(
                                       color: Colors.grey[600],
                                     ),
                                   ),
-                    
+
                                   SizedBox(height: 10),
-                    
+
                                   // Description
                                   Text(
-                                    movies[index].description,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                    widget.movies[index].description,
+                                    style: widget.theme.textTheme.bodyMedium
+                                        ?.copyWith(
                                       color: Colors.grey[700],
                                       overflow: TextOverflow.ellipsis,
                                     ),

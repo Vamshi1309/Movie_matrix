@@ -176,7 +176,7 @@ class _SearchScreenState extends State<SearchScreen> {
             if (data.recentSearches.isNotEmpty) ...[
               _buildWrapSection(
                 title: "Recent searches",
-                list: data.recentSearches,
+                list: data.recentSearches.take(10).toList(),
                 theme: theme,
                 onTap: searchController.onChipTap,
               ),
@@ -187,7 +187,7 @@ class _SearchScreenState extends State<SearchScreen> {
             if (data.popularMovies.isNotEmpty) ...[
               _buildWrapSection(
                 title: "Popular Now",
-                list: data.popularMovies,
+                list: data.popularMovies.take(10).toList(),
                 theme: theme,
                 onTap: searchController.onChipTap,
               ),
