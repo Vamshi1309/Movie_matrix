@@ -5,6 +5,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:movie_matrix/controllers/theme_controller.dart';
 import 'package:movie_matrix/providers/auth_provider.dart';
+import 'package:movie_matrix/views/forgot%20password/forgot_password_screen.dart';
 import 'package:movie_matrix/views/main_screen.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
@@ -277,10 +278,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           if (isLogin) ...[
             Align(
               alignment: Alignment.bottomRight,
-              child: Text(
-                "Forgot Password?",
-                style: theme.textTheme.labelMedium,
-              ),
+              child: TextButton(
+                  onPressed: () {
+                    Get.to(ForgotPasswordScreen());
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    "Forgot Password?",
+                    style: TextStyle(color: Colors.red),
+                  )),
             ),
           ] else ...[
             SizedBox(height: 10)

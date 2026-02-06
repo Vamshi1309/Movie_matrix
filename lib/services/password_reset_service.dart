@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:movie_matrix/core/network/api_service.dart';
+import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/data/models/password_reset_models.dart';
 
@@ -9,7 +10,7 @@ class PasswordResetService {
   Future<PasswordResetResponse> sendOtp(String email) async {
     try {
       AppLogger.i("📧 Sending OTP to: $email");
-      AppLogger.i("URL: $baseUrl/send-otp");
+      AppLogger.i("URL: ${ApiConfig.baseUrl}/api$baseUrl/send-otp");
 
       final response = await ApiService.dio.post(
         '$baseUrl/send-otp',

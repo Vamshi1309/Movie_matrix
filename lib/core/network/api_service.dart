@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:movie_matrix/core/utils/api_config.dart';
+import 'package:movie_matrix/core/utils/logger.dart';
 import 'package:movie_matrix/services/storage_service.dart';
 import 'package:movie_matrix/views/auth/login_screen.dart';
 
@@ -18,9 +19,12 @@ class ApiService {
   )..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          AppLogger.i("🔵 Interceptor triggered");
           final token = await StorageService.getToken();
+          AppLogger.i("token : $token");
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
+            AppLogger.i("token : $token");
           }
           return handler.next(options);
         },
