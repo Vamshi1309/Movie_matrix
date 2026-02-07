@@ -1,14 +1,32 @@
-import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:movie_matrix/controllers/theme_controller.dart';
+import 'dart:async';
 
-class ResetPasswordScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:get/route_manager.dart';
+import 'package:movie_matrix/controllers/password%20reset%20controller/password_reset_controller.dart';
+import 'package:movie_matrix/controllers/theme_controller.dart';
+import 'package:movie_matrix/views/auth/login_screen.dart';
+
+class ResetPasswordScreen extends StatefulWidget {
   ResetPasswordScreen({super.key});
 
+  @override
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final theme = Get.put(ThemeController()).themeData;
+
   final textController1 = new TextEditingController();
   final textController2 = new TextEditingController();
+
+  final controller = Get.put(PasswordResetController());
+
+  final _formKey = GlobalKey<FormState>();
+
+  bool _obscure1 = true;
+  bool _obscure2 = true;
 
   @override
   Widget build(BuildContext context) {
@@ -71,38 +89,82 @@ class ResetPasswordScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            _buildInputFields(title: "New Password", controller: textController1),
-            SizedBox(height: 20),
-            _buildInputFields(title: "Confirm Password",controller: textController2),
+            Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildInputFields(
+                      title: "New Password",
+                      controller: textController1,
+                      obscure: _obscure1,
+                      onToggle: () {
+                        setState(() {
+                          _obscure1 = !_obscure1;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    _buildInputFields(
+                        title: "Confirm Password",
+                        controller: textController2,
+                        obscure: _obscure2,
+                        onToggle: () {
+                          setState(() {
+                            _obscure2 = !_obscure2;
+                          });
+                        },
+                        isConfirm: true),
+                  ],
+                )),
             SizedBox(height: 30),
             SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: (){}, 
-                
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(13)
-                  )
-                ),
-                child: Text(
-                  "Update Password"
-                  )
-                ),
-            )
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      _formKey.currentState!.validate();
+
+                      final res =
+                          await controller.resetPassword(textController2.text);
+
+                      if (res) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Password changed Sucessfully"),
+                            backgroundColor: Colors.green));
+                        await Timer(Duration(seconds: 2), () {
+                          Get.to(LoginScreen());
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(controller.errorMessage.value),
+                            backgroundColor: Colors.red));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13))),
+                    child: Obx(() {
+                      return controller.isLoading.value
+                          ? CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            )
+                          : Text("Update Password");
+                    })))
           ],
         ),
       ),
     ));
   }
 
-  Widget _buildInputFields({
-    required String title,
-    required TextEditingController controller,
-  }) {
+  Widget _buildInputFields(
+      {required String title,
+      required TextEditingController controller,
+      bool obscure = true,
+      required VoidCallback onToggle,
+      bool isConfirm = false}) {
     return Container(
       width: double.infinity,
       child: Column(
@@ -119,20 +181,32 @@ class ResetPasswordScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10),
-          TextField(
+          TextFormField(
+            obscureText: obscure,
             controller: controller,
+            validator: isConfirm
+                ? (Value) {
+                    if (Value != textController1.text) {
+                      return "Password did not match";
+                    }
+                  }
+                : null,
             cursorColor: Colors.red,
             decoration: InputDecoration(
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13),
-                  borderSide: BorderSide(width: 2, color: Colors.red),
-                ),
-                enabledBorder:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
-                hintText: "Password must be 8 characters"
-                ),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13),
+                borderSide: BorderSide(width: 2, color: Colors.red),
+              ),
+              enabledBorder:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
+              hintText: "Password must be 8 characters",
+              suffixIcon: IconButton(
+                icon: Icon(Icons.remove_red_eye, color: Colors.red),
+                onPressed: onToggle,
+              ),
+            ),
           ),
         ],
       ),

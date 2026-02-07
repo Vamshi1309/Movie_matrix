@@ -11,6 +11,7 @@ class PasswordResetController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final email = ''.obs;
+  final successMsg = ''.obs();
 
   // Cooldown timer (30 seconds)
   final remainingSeconds = 0.obs;
