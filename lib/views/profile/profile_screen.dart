@@ -55,7 +55,7 @@ class ProfileScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Vamshi",
+                      controller.user.value!.name,
                       style: theme.textTheme.titleMedium,
                     ),
                     SizedBox(height: 5),

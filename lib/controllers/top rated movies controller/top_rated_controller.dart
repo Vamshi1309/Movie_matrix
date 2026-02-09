@@ -32,7 +32,7 @@ class TopRatedController extends GetxController {
 
       final result = await _movieService.getTopRatedMovies(
         page: topRatedPage.value,
-        limit: 5,
+        limit: 10,
       );
 
       final movies = result['movies'] as List<MovieModel>;

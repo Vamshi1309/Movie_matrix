@@ -50,7 +50,7 @@ class MovieService {
 
   Future<Map<String, dynamic>> getNowPlayingMovies({
     int page = 0,
-    int limit = 5,
+    int limit = 10,
   }) async {
     try {
       AppLogger.i('📡 Fetching now playing movies...');

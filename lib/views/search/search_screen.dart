@@ -116,7 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: Image.network(
-                  ApiConfig.getFullImageUrl(movie.posterUrl),
+                  movie.posterUrl,
                   width: 50,
                   height: 75,
                   fit: BoxFit.cover,

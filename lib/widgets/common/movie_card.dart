@@ -102,7 +102,7 @@ class MovieCard extends StatelessWidget {
                     },
                     child: BuildMovieCard(
                       theme: theme,
-                      imgUrl: ApiConfig.getFullImageUrl(movie.posterUrl),
+                      imgUrl: movie.posterUrl,
                       title: movie.title,
                       rating: movie.rating,
                     ),

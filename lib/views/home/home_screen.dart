@@ -19,33 +19,40 @@ class HomeScreen extends StatelessWidget {
     final theme = Get.put(ThemeController()).themeData;
 
     return Scaffold(
-        appBar: CustomAppBar(theme: theme),
-        body: Obx(() {
-          if (allCategoriesFailed(controller, topRatedController)) {
-            return Center(
-              child: Text(
-                "No movies found",
-                style: theme.textTheme.titleMedium,
-              ),
-            );
-          }
+      appBar: CustomAppBar(theme: theme),
+      body: Obx(() {
+        if (allCategoriesLoading(controller, topRatedController)) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  buildTrending(theme),
-                  SizedBox(height: AppSpacing.lg),
-                  buildTopRated(theme),
-                  SizedBox(height: AppSpacing.lg),
-                  buildForYou(theme),
-                  SizedBox(height: AppSpacing.lg),
-                ],
-              ),
+        if (allCategoriesFailed(controller, topRatedController)) {
+          return Center(
+            child: Text(
+              "No movies found",
+              style: theme.textTheme.titleMedium,
             ),
           );
-        }));
+        }
+
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              children: [
+                buildTrending(theme),
+                SizedBox(height: AppSpacing.lg),
+                buildTopRated(theme),
+                SizedBox(height: AppSpacing.lg),
+                buildForYou(theme),
+                SizedBox(height: AppSpacing.lg),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
   }
 
   bool allCategoriesFailed(
@@ -106,5 +113,14 @@ class HomeScreen extends StatelessWidget {
         );
       }
     });
+  }
+
+  bool allCategoriesLoading(
+    HomeMovieController controller,
+    TopRatedController topRatedController,
+  ) {
+    return controller.isLoadingTrending.value &&
+        controller.isLoadingForYou.value &&
+        topRatedController.isLoading.value;
   }
 }

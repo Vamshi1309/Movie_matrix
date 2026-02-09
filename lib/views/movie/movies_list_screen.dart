@@ -100,8 +100,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: CachedNetworkImage(
-                                imageUrl: ApiConfig.getFullImageUrl(
-                                    widget.movies[index].posterUrl),
+                                imageUrl: widget.movies[index].posterUrl,
                                 height: 110,
                                 // Adjusted height
                                 width: 80,

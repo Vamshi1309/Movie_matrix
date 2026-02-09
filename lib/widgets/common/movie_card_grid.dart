@@ -69,8 +69,7 @@ class MovieCardGrid extends StatelessWidget {
                           },
                           child: BuildMovieCard(
                             theme: theme,
-                            imgUrl:
-                                ApiConfig.getFullImageUrl(movieData.posterUrl),
+                            imgUrl: movieData.posterUrl,
                             title: movieData.title,
                             rating: movieData.rating,
                           ),
