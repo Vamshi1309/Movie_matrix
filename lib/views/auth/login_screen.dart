@@ -301,12 +301,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             onPressed: onSubmit,
           ),
           SizedBox(height: 20),
-          _buildButton(
-            title: "Continue as guest",
-            foregroundColor: Colors.black,
-            backgroundColor: Colors.grey.shade300,
-            onPressed: _handleGuestMode,
-          ),
         ],
       ),
     );
