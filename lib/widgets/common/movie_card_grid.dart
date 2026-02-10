@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/views/movie/movie_detail_screen.dart';
 import 'package:movie_matrix/widgets/common/build_movie_card.dart';

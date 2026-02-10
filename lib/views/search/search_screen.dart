@@ -6,7 +6,6 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:movie_matrix/controllers/search_controller/search_controller.dart';
 import 'package:movie_matrix/controllers/theme_controller.dart';
 import 'package:movie_matrix/core/themes/app_spacing.dart';
-import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/widgets/app%20bar/app_bar.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -21,7 +20,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    // ✅ Sync text field with searchQuery observable
     ever(searchController.searchQuery, (query) {
       if (_searchTextController.text != query) {
         _searchTextController.text = query;
@@ -108,36 +106,57 @@ class _SearchScreenState extends State<SearchScreen> {
       }
 
       return ListView.separated(
-          itemCount: searchController.suggestions.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final movie = searchController.suggestions[index];
-            return ListTile(
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  movie.posterUrl,
-                  width: 50,
-                  height: 75,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 50,
-                      height: 75,
-                      color: Colors.grey[300],
-                      child: Icon(Icons.movie, color: Colors.red),
-                    );
-                  },
+        itemCount: searchController.suggestions.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
+        itemBuilder: (context, index) {
+          final movie = searchController.suggestions[index];
+
+          return Obx(() => ListTile(
+                enabled: !searchController.isNavigating.value,
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.network(
+                    movie.posterUrl,
+                    width: 50,
+                    height: 75,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 50,
+                        height: 75,
+                        color: Colors.grey[300],
+                        child: Icon(Icons.movie, color: Colors.red),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              title: Text(
-                movie.title,
-                style: theme.textTheme.bodyMedium,
-              ),
-              trailing: Icon(Icons.chevron_right),
-              onTap: () => searchController.onMovieSelected(movie.title),
-            );
-          });
+                title: Text(
+                  movie.title,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: searchController.isNavigating.value
+                        ? Colors.grey
+                        : null,
+                  ),
+                ),
+                trailing: Obx(() {
+                  final isThisMovieLoading =
+                      searchController.navigatingMovieTitle.value ==
+                          movie.title;
+
+                  return isThisMovieLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chevron_right);
+                }),
+                onTap: searchController.isNavigating.value
+                    ? null
+                    : () => searchController.onMovieSelected(movie.title),
+              ));
+        },
+      );
     }));
   }
 
@@ -151,13 +170,12 @@ class _SearchScreenState extends State<SearchScreen> {
 
         // Show error
         if (searchController.error.value.isNotEmpty) {
-          final cleanError = searchController.error.value.replaceAll("Exception: ","");
+          final cleanError =
+              searchController.error.value.replaceAll("Exception: ", "");
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(cleanError)
-              ],
+              children: [Text(cleanError)],
             ),
           );
         }
@@ -212,23 +230,27 @@ class _SearchScreenState extends State<SearchScreen> {
           style: theme.textTheme.labelLarge,
         ),
         SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: 4,
-          runSpacing: 2,
-          children: list.map((movie) {
-            return InputChip(
-              label: Text(
-                movie,
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-              ),
-              backgroundColor: Color(0xFFF8FAFF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              onPressed: () => onTap(movie),
-            );
-          }).toList(),
-        ),
+        Obx(() => Wrap(
+              spacing: 4,
+              runSpacing: 2,
+              children: list.map((movie) {
+                return InputChip(
+                  label: Text(
+                    movie,
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+                  ),
+                  backgroundColor: searchController.isNavigating.value
+                      ? Colors.grey[300] // ✅ Dim while loading
+                      : Color(0xFFF8FAFF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  onPressed: searchController.isNavigating.value
+                      ? null // ✅ Disable while navigating
+                      : () => onTap(movie),
+                );
+              }).toList(),
+            )),
       ],
     );
   }

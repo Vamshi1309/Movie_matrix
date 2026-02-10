@@ -1,8 +1,5 @@
-import 'dart:math' as Math;
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:movie_matrix/core/utils/api_config.dart';
 import 'package:movie_matrix/data/models/movie_model.dart';
 import 'package:movie_matrix/views/home/all_movies_screen.dart';
 import 'package:movie_matrix/views/movie/movie_detail_screen.dart';
