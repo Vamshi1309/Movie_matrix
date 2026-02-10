@@ -80,16 +80,19 @@ class MovieSearchController extends GetxController {
         barrierDismissible: false,
       );
 
+      print('🎬 Fetching movie: $movieTitle');
+
       // Fetch movie details
       final movie = await _searchService.getMovieByTitle(movieTitle);
 
       // Close loading dialog
       Get.back();
 
-      if (movie != null) {
+      if (movie != null && movie.data != null) {
+        print('✅ Movie found: ${movie.data!.title}');
         // Navigate to movie details screen
         final result = await Get.to(
-            () => MovieDetailsScreen(movieName: searchQuery.value));
+            () => MovieDetailsScreen(movieName: movie.data!.title));
 
         // Refresh search data when coming back
         if (result == true || result == null) {
@@ -97,6 +100,7 @@ class MovieSearchController extends GetxController {
           clearSearch();
         }
       } else {
+        print('❌ Movie not found: $movieTitle');
         Get.snackbar(
           'Not Found',
           'Movie not found',
@@ -106,7 +110,12 @@ class MovieSearchController extends GetxController {
         );
       }
     } catch (e) {
-      Get.back(); // Close loading dialog
+      print('💥 Error fetching movie: $e'); // ✅ Add logging
+
+      if (Get.isDialogOpen ?? false) {
+        Get.back(); // Close loading dialog
+      }
+
       Get.snackbar(
         'Error',
         'Error: $e',
