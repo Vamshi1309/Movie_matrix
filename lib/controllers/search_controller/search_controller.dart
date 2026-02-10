@@ -38,9 +38,9 @@ class MovieSearchController extends GetxController {
 
       final searchResponse = await _searchService.getSearchData();
       searchData.value = searchResponse.data;
-      isLoadingData.value = false;
     } catch (e) {
       error.value = e.toString();
+    } finally {
       isLoadingData.value = false;
     }
   }
@@ -85,43 +85,54 @@ class MovieSearchController extends GetxController {
       // Fetch movie details
       final movie = await _searchService.getMovieByTitle(movieTitle);
 
-      // Close loading dialog
-      Get.back();
+      // Close loading dialog - IMPORTANT: Check if dialog is still open
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
 
       if (movie != null && movie.data != null) {
         print('✅ Movie found: ${movie.data!.title}');
-        // Navigate to movie details screen
-        final result = await Get.to(
-            () => MovieDetailsScreen(movieName: movie.data!.title));
 
-        // Refresh search data when coming back
-        if (result == true || result == null) {
-          await loadSearchData();
-          clearSearch();
-        }
+        // Navigate to movie details screen
+        await Get.to(
+          () => MovieDetailsScreen(movieName: movie.data!.title),
+        );
+        _reloadSearchDataSilently();
       } else {
         print('❌ Movie not found: $movieTitle');
+
         Get.snackbar(
           'Not Found',
-          'Movie not found',
+          'Movie "$movieTitle" not found in our database',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
       }
     } catch (e) {
-      print('💥 Error fetching movie: $e'); // ✅ Add logging
+      print('💥 Error fetching movie: $e');
 
-      if (Get.isDialogOpen ?? false) {
-        Get.back(); // Close loading dialog
+      // Close dialog if still open
+      if (Get.isDialogOpen == true) {
+        Get.back();
       }
 
       Get.snackbar(
         'Error',
-        'Error: $e',
+        'Failed to load movie details',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
+  }
+
+  void _reloadSearchDataSilently() {
+    _searchService.getSearchData().then((searchResponse) {
+      searchData.value = searchResponse.data;
+    }).catchError((e) {
+      print('Failed to reload search data: $e');
+    });
   }
 
   /// Handle tap on recent search or popular movie chip
